@@ -2,6 +2,10 @@
 # Created by https://www.toptal.com/developers/gitignore/api/intellij,windows,macos,gradle,git
 # Edit at https://www.toptal.com/developers/gitignore?templates=intellij,windows,macos,gradle,git
 
+# Ignore secret files.
+src/main/resources/application.yml
+src/main/java/com/umc/miner/config/secret/
+
 ### Git ###
 # Created by git for backups. To disable backups in Git:
 # $ git config --global mergetool.keepBackup false
