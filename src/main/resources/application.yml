@@ -1,6 +1,0 @@
-server:
-  port: 9090  # 9090? ??? ??
-
-spring:
-  application:
-    name: miner
