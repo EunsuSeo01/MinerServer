@@ -28,4 +28,11 @@ public class ValidationRegex {
         return matcher.find();
     }
 
+    // 비밀번호
+    public static boolean isRegexPassword(String target) {
+        String regex = "^(?=.*[A-Za-z])(?=.*\\d)(?=.*[$@$!%*#?&])[A-Za-z\\d$@$!%*#?&]{8,}$";
+        Pattern pattern = Pattern.compile(regex, Pattern.CASE_INSENSITIVE); // Pattern.CASE_INSENSITIVE : 대소문자 구분 X
+        Matcher matcher = pattern.matcher(target);
+        return matcher.find();
+    }
 }
