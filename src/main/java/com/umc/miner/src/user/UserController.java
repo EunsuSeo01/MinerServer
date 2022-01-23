@@ -43,27 +43,6 @@ public class UserController {
         this.smsService = smsService;
     }
 
-    /**
-     * [아이디(=이메일) 찾기]
-     * 일치하는 phoneNum이 있는지 확인하는 API
-     * [GET] /miner/users/phoneNum
-     */
-    @GetMapping("/phoneNum")
-    public BaseResponse<GetUserIdxRes> postMessage(@RequestBody GetUserIdxReq getUserIdxReq) {
-        try {
-            String phoneNum = getUserIdxReq.getPhoneNum();
-            // DB내에 일치하는 phoneNum이 있는지 확인.
-            if (userProvider.checkPhoneNum(phoneNum) == 0) {
-                return new BaseResponse<>(NOT_REGISTERED_PHONE_NUMBER);
-            }
-
-            // 있으면 그 핸드폰 번호의 유저 인덱스를 가져온다.
-            GetUserIdxRes getUserIdxRes = new GetUserIdxRes(userProvider.getUserIdx(phoneNum));
-            return new BaseResponse<>(getUserIdxRes);
-        } catch (BaseException exception) {
-        return new BaseResponse<>((exception.getStatus()));
-        }
-    }
 
     /**
      * 로그인 API
@@ -120,6 +99,29 @@ public class UserController {
         try {
             PostUserRes postUserRes = userService.createUser(postUserReq);
             return new BaseResponse<>(postUserRes);
+        } catch (BaseException exception) {
+            return new BaseResponse<>((exception.getStatus()));
+        }
+    }
+
+
+    /**
+     * [아이디(=이메일) 찾기]
+     * 일치하는 phoneNum이 있는지 확인하는 API
+     * [GET] /miner/users/phoneNum
+     */
+    @GetMapping("/phoneNum")
+    public BaseResponse<GetUserIdxRes> postMessage(@RequestBody GetUserIdxReq getUserIdxReq) {
+        try {
+            String phoneNum = getUserIdxReq.getPhoneNum();
+            // DB내에 일치하는 phoneNum이 있는지 확인.
+            if (userProvider.checkPhoneNum(phoneNum) == 0) {
+                return new BaseResponse<>(NOT_REGISTERED_PHONE_NUMBER);
+            }
+
+            // 있으면 그 핸드폰 번호의 유저 인덱스를 가져온다.
+            GetUserIdxRes getUserIdxRes = new GetUserIdxRes(userProvider.getUserIdx(phoneNum));
+            return new BaseResponse<>(getUserIdxRes);
         } catch (BaseException exception) {
             return new BaseResponse<>((exception.getStatus()));
         }
