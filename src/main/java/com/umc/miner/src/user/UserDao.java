@@ -1,23 +1,21 @@
 package com.umc.miner.src.user;
 
-
 import com.umc.miner.src.user.model.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.stereotype.Repository;
 
 import javax.sql.DataSource;
-import java.util.List;
 
 @Repository
-
-public class UserDao  {
+public class UserDao {
 
     private JdbcTemplate jdbcTemplate;
 
     @Autowired
-    public void setDataSource(DataSource dataSource) { this.jdbcTemplate = new JdbcTemplate(dataSource); }
-
+    public void setDataSource(DataSource dataSource) {
+        this.jdbcTemplate = new JdbcTemplate(dataSource);
+    }
 
     // 1. 로그인 ?email=
     public User getPwd(PostLoginReq postLoginReq) {
@@ -63,4 +61,24 @@ public class UserDao  {
                 int.class,
                 checkNickNameParams);
     }
+
+    // 핸드폰 번호 가입여부 확인.
+    public int checkPhoneNum(String phoneNum) {
+        String checkPhoneNumQuery = "select exists(select userIdx from User where phoneNum = ?)"; // User Table에 해당 phoneNum를 갖는 유저가 존재하는가?
+
+        return this.jdbcTemplate.queryForObject(checkPhoneNumQuery, int.class, phoneNum); // 쿼리문의 결과(존재하지 않음(False,0),존재함(True, 1))를 int형(0,1)으로 반환됩니다.
+    }
+
+    // 유저 인덱스 전달.
+    public int getUserIdx(String phoneNum) {
+        String getUserIdxQuery = "select userIdx from User where phoneNum = ?";
+        return this.jdbcTemplate.queryForObject(getUserIdxQuery, int.class, phoneNum);
+    }
+
+    // 이메일 알려준다.
+    public String getUserEmail(int userIdx) {
+        String getEmailQuery = "select email from User where userIdx = ?";
+        return this.jdbcTemplate.queryForObject(getEmailQuery, String.class, userIdx);
+    }
+
 }

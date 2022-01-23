@@ -2,6 +2,7 @@ package com.umc.miner.src.user;
 
 import com.umc.miner.config.BaseException;
 import com.umc.miner.config.secret.Secret;
+import static com.umc.miner.config.BaseResponseStatus.*;
 import com.umc.miner.src.user.model.*;
 import com.umc.miner.utils.AES128;
 import com.umc.miner.utils.JwtService;
@@ -9,20 +10,16 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
-import java.util.List;
-import static com.umc.miner.config.BaseResponseStatus.*;
 
 @Service
-
 public class UserProvider {
 
     private final UserDao userDao;
     private final JwtService jwtService;
 
-
     final Logger logger = LoggerFactory.getLogger(this.getClass());
 
-    @Autowired //readme 참고
+    @Autowired
     public UserProvider(UserDao userDao, JwtService jwtService) {
         this.userDao = userDao;
         this.jwtService = jwtService;
@@ -68,4 +65,68 @@ public class UserProvider {
             throw new BaseException(UNEXPECTED_ERROR);
         }
     }
+
+
+    // 핸드폰 번호 가입여부 확인.
+    public int checkPhoneNum(String phoneNum) throws BaseException {
+        try {
+            return userDao.checkPhoneNum(phoneNum);
+        } catch (Exception exception) {
+            throw new BaseException(DATABASE_ERROR);
+        }
+    }
+
+    // 유저 인덱스 가져옴.
+    public int getUserIdx(String phoneNum) throws BaseException {
+        try {
+            return userDao.getUserIdx(phoneNum);
+        } catch (Exception exception) {
+            throw new BaseException(DATABASE_ERROR);
+        }
+    }
+
+    // 이메일 가져옴 -> 이메일 가려줌.
+    public String getUserEmail(int userIdx) throws BaseException {
+        try {
+            return hideEmailByAsterisk(userDao.getUserEmail(userIdx));
+        } catch (Exception exception) {
+            throw new BaseException(DATABASE_ERROR);
+        }
+    }
+
+    // Asterisk로 이메일 앞 뒤 가리기.
+    private static final String HIDE_CHAR = "*";
+
+    public static String hideEmailByAsterisk(String email) {
+        int atSignIndex = email.indexOf("@");
+
+        StringBuilder stringBuilder = new StringBuilder(email);
+        String emailName = email.substring(0, atSignIndex);
+        String emailRoar = email.substring(atSignIndex + 1, email.length());
+
+        stringBuilder.replace(2, atSignIndex, makeAsterisk(emailName.length()));
+        stringBuilder.replace(atSignIndex + 3, email.length(), makeAsterisk(emailRoar.length()));
+
+        return stringBuilder.toString();
+    }
+
+    // 필요한 만큼 Asterisk 만들기.
+    public static String makeAsterisk(int length) {
+
+        String addStr = "";
+
+        if (length > 4) {
+            for (int i = 0; i < length - 2; i++) {
+                addStr += HIDE_CHAR;
+            }
+            return addStr;
+        }
+        else {
+            for (int i = 0; i < 3; i++) {
+                addStr += HIDE_CHAR;
+            }
+            return addStr;
+        }
+    }
+
 }
