@@ -23,9 +23,10 @@ public enum BaseResponseStatus {
     INVALID_USER_JWT(false, 2003,"권한이 없는 유저의 접근입니다."),
 
     // users
-    USERS_EMPTY_USER_ID(false, 2010, "유저 아이디 값을 확인해주세요."),
+    USERS_EMPTY_USER_EMAIL(false, 2010, "이메일을 입력해주세요."),
+    USERS_INACTIVE_USER_EMAIL(false, 2012,"활성화된 계정이 아닙니다."),
 
-    // [POST] /users
+    // 회원가입 [POST] /users
     POST_USERS_EMPTY_EMAIL(false, 2015, "이메일을 입력해주세요."),
     POST_USERS_INVALID_EMAIL(false, 2016, "이메일 형식을 확인해주세요."),
     POST_USERS_EXISTS_EMAIL(false, 2017,"중복된 이메일입니다."),

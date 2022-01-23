@@ -54,7 +54,6 @@ public class UserService {
             }
 
             try {
-
                 int userIdx = userDao.createUser(postUserReq);
                 String jwt = jwtService.createJwt(userIdx); //jwt 발급
                 return new PostUserRes(userIdx, jwt);
