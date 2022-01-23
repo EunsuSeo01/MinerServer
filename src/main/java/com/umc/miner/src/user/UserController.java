@@ -1,11 +1,10 @@
 package com.umc.miner.src.user;
 
-import com.umc.miner.src.user.model.PostUserReq;
-import com.umc.miner.src.user.model.PostUserRes;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import com.umc.miner.config.BaseException;
 import com.umc.miner.config.BaseResponse;
+import com.umc.miner.src.user.model.*;
 import com.umc.miner.utils.JwtService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
@@ -37,6 +36,32 @@ public class UserController {
         this.userService = userService;
         this.jwtService = jwtService;
     }
+
+    /**
+     * 로그인 API
+     * [POST] /users/logIn
+     */
+    @ResponseBody
+    @PostMapping("/login")
+    public BaseResponse<PostLoginRes> logIn(@RequestBody PostLoginReq postLoginReq) {
+
+        if (postLoginReq.getEmail() == null) {
+            return new BaseResponse<>(USERS_EMPTY_USER_EMAIL);
+        }
+
+
+        if (postLoginReq.getStatus() == "inactive") {
+            return new BaseResponse<>(USERS_INACTIVE_USER_EMAIL);
+        }
+
+        try {
+            PostLoginRes postLoginRes = userProvider.logIn(postLoginReq);
+            return new BaseResponse<>(postLoginRes);
+        } catch (BaseException exception) {
+            return new BaseResponse<>(exception.getStatus());
+        }
+    }
+
 
     /**
      * 회원가입 API

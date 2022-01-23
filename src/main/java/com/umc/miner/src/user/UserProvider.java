@@ -28,6 +28,29 @@ public class UserProvider {
         this.jwtService = jwtService;
     }
 
+    // 1. 로그인 (password 검사)
+    public PostLoginRes logIn(PostLoginReq postLoginReq) throws BaseException {
+        User user = userDao.getPwd(postLoginReq);
+        String password;
+        try {
+            password = new AES128(Secret.USER_INFO_PASSWORD_KEY).decrypt(user.getPassword()); // 암호화
+        } catch (Exception ignored) {
+            throw new BaseException(PASSWORD_DECRYPTION_ERROR);
+        }
+
+        if (postLoginReq.getPassword().equals(password)) { //비말번호가 일치한다면 userIdx를 가져온다.
+            int userIdx = userDao.getPwd(postLoginReq).getUserIdx();
+            String jwt = jwtService.createJwt(userIdx);
+            String nickName = userDao.getPwd(postLoginReq).getNickName();
+            return new PostLoginRes(userIdx, jwt, nickName);
+
+        } else { // 비밀번호가 다르다면 에러메세지를 출력한다.
+            throw new BaseException(FAILED_TO_LOGIN);
+        }
+    }
+
+
+    // 2. 회원가입
     // 해당 이메일이 이미 User 테이블에 존재하는지 확인
     public int checkEmail(String email) throws BaseException {
         try {
