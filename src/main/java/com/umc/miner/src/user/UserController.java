@@ -13,20 +13,11 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
 import static com.umc.miner.config.BaseResponseStatus.*;
+import static com.umc.miner.utils.ValidationRegex.isRegexEmail;
+import static com.umc.miner.utils.ValidationRegex.isRegexPassword;
 
-@RestController // Rest API 또는 WebAPI를 개발하기 위한 어노테이션. @Controller + @ResponseBody 를 합친것.
-// @Controller      [Presentation Layer에서 Contoller를 명시하기 위해 사용]
-//  [Presentation Layer?] 클라이언트와 최초로 만나는 곳으로 데이터 입출력이 발생하는 곳
-//  Web MVC 코드에 사용되는 어노테이션. @RequestMapping 어노테이션을 해당 어노테이션 밑에서만 사용할 수 있다.
-// @ResponseBody    모든 method의 return object를 적절한 형태로 변환 후, HTTP Response Body에 담아 반환.
+@RestController
 @RequestMapping("/miner/users")
-// method가 어떤 HTTP 요청을 처리할 것인가를 작성한다.
-// 요청에 대해 어떤 Controller, 어떤 메소드가 처리할지를 맵핑하기 위한 어노테이션
-// URL(/app/users)을 컨트롤러의 메서드와 매핑할 때 사용
-/**
- * Controller란?
- * 사용자의 Request를 전달받아 요청의 처리를 담당하는 Service, Prodiver 를 호출
- */
 public class UserController {
 
     final Logger logger = LoggerFactory.getLogger(this.getClass());
@@ -69,6 +60,66 @@ public class UserController {
             // 있으면 그 핸드폰 번호의 유저 인덱스를 가져온다.
             GetUserIdxRes getUserIdxRes = new GetUserIdxRes(userProvider.getUserIdx(phoneNum));
             return new BaseResponse<>(getUserIdxRes);
+        } catch (BaseException exception) {
+        return new BaseResponse<>((exception.getStatus()));
+        }
+    }
+
+    /**
+     * 로그인 API
+     * [POST] /users/logIn
+     */
+    @ResponseBody
+    @PostMapping("/login")
+    public BaseResponse<PostLoginRes> logIn(@RequestBody PostLoginReq postLoginReq) {
+
+        if (postLoginReq.getEmail() == null) {
+            return new BaseResponse<>(USERS_EMPTY_USER_EMAIL);
+        }
+
+
+        if (postLoginReq.getStatus() == "inactive") {
+            return new BaseResponse<>(USERS_INACTIVE_USER_EMAIL);
+        }
+
+        try {
+            PostLoginRes postLoginRes = userProvider.logIn(postLoginReq);
+            return new BaseResponse<>(postLoginRes);
+        } catch (BaseException exception) {
+            return new BaseResponse<>(exception.getStatus());
+        }
+    }
+
+
+    /**
+     * 회원가입 API
+     * [POST] /users/signup
+     */
+
+    @ResponseBody
+    @PostMapping("/signup")
+    public BaseResponse<PostUserRes> createUser(@RequestBody PostUserReq postUserReq) {
+        if (postUserReq.getEmail() == null) {
+            return new BaseResponse<>(POST_USERS_EMPTY_EMAIL);
+        }
+
+        // Email 형식
+        if (!isRegexEmail(postUserReq.getEmail())) {
+            return new BaseResponse<>(POST_USERS_INVALID_EMAIL);
+        }
+
+        if (postUserReq.getPassword() == null) {
+            return new BaseResponse<>(POST_USERS_EMPTY_PASSWORD);
+        }
+
+        // Password 형식
+        if (!isRegexPassword(postUserReq.getPassword())) {
+            return new BaseResponse<>(POST_USERS_INVALID_PASSWORD);
+        }
+
+        try {
+            PostUserRes postUserRes = userService.createUser(postUserReq);
+            return new BaseResponse<>(postUserRes);
         } catch (BaseException exception) {
             return new BaseResponse<>((exception.getStatus()));
         }
