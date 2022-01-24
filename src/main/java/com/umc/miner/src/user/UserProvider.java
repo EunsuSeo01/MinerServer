@@ -47,7 +47,6 @@ public class UserProvider {
     }
 
 
-    // 2. 회원가입
     // 해당 이메일이 이미 User 테이블에 존재하는지 확인
     public int checkEmail(String email) throws BaseException {
         try {

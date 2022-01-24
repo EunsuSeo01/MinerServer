@@ -35,4 +35,12 @@ public class ValidationRegex {
         Matcher matcher = pattern.matcher(target);
         return matcher.find();
     }
+
+    // 닉네임
+    public static boolean isRegexNickName(String target) {
+        String regex = "^([a-zA-Z0-9ㄱ-ㅎ|ㅏ-ㅣ|가-힣]).{1,5}$";
+        Pattern pattern = Pattern.compile(regex, Pattern.CASE_INSENSITIVE); // Pattern.CASE_INSENSITIVE : 대소문자 구분 X
+        Matcher matcher = pattern.matcher(target);
+        return matcher.find();
+    }
 }

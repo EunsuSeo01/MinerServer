@@ -15,6 +15,7 @@ import org.springframework.web.bind.annotation.*;
 import static com.umc.miner.config.BaseResponseStatus.*;
 import static com.umc.miner.utils.ValidationRegex.isRegexEmail;
 import static com.umc.miner.utils.ValidationRegex.isRegexPassword;
+import static com.umc.miner.utils.ValidationRegex.isRegexNickName;
 
 @RestController
 @RequestMapping("/miner/users")
@@ -68,6 +69,58 @@ public class UserController {
             return new BaseResponse<>(exception.getStatus());
         }
     }
+
+    /**
+     * 닉네임 중복확인 API
+     * [GET] /miner/users/nick
+     */
+    @ResponseBody
+    @GetMapping("/email")
+    public BaseResponse checkEmail(@RequestBody GetEmailReq getEmailReq) {
+        if (getEmailReq.getEmail() == null) {
+            return new BaseResponse<>(POST_USERS_EMPTY_EMAIL);
+        }
+
+        // NickName 형식
+        if (!isRegexEmail(getEmailReq.getEmail())) {
+            return new BaseResponse<>(POST_USERS_INVALID_EMAIL);
+        }
+
+        try {
+            GetEmailRes getEmailRes = userService.getEmail(getEmailReq);
+            return new BaseResponse<>(getEmailRes);
+        } catch (BaseException exception) {
+            return new BaseResponse<>((exception.getStatus()));
+        }
+    }
+
+
+
+    /**
+     * 닉네임 중복확인 API
+     * [GET] /miner/users/nick
+     */
+    @ResponseBody
+    @GetMapping("/name")
+    public BaseResponse checkNickName(@RequestBody GetNameReq getNameReq) {
+        if (getNameReq.getNickName() == null) {
+            return new BaseResponse<>(POST_USERS_EMPTY_NAME);
+        }
+
+        // NickName 형식
+        if (!isRegexNickName(getNameReq.getNickName())) {
+            return new BaseResponse<>(POST_USERS_INVALID_NAME);
+        }
+
+        try {
+            GetNameRes getNameRes = userService.getNickName(getNameReq);
+            return new BaseResponse<>(getNameRes);
+        } catch (BaseException exception) {
+            return new BaseResponse<>((exception.getStatus()));
+        }
+    }
+
+
 
 
     /**
