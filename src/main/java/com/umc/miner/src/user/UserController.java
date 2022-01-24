@@ -2,7 +2,7 @@ package com.umc.miner.src.user;
 
 import com.umc.miner.src.sms.SmsService;
 import com.umc.miner.src.sms.SmsProvider;
-import com.umc.miner.src.sms.model.GetAuthReq;
+import com.umc.miner.src.sms.model.*;
 import com.umc.miner.src.user.model.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -104,6 +104,27 @@ public class UserController {
         }
     }
 
+    /**
+     * [인증번호 확인 API]
+     * 회원가입 때 인증번호 일치하는지 안 하는지 확인하는 API
+     * [GET} /miner/sign-up/auth
+     */
+    @GetMapping("/signup/auth")
+    public BaseResponse<GetAuthRes> checkAuthNum(@RequestBody GetAuthReq getEmailReq) {
+        try {
+            // 인증번호가 일치하지 않은 경우.
+            if (smsProvider.checkAuthNum(getEmailReq) == 0) {
+                return new BaseResponse<>(NOT_MATCHED_AUTH);
+            }
+
+            // 일치함 -> SmsAuth 테이블에서 row 제거.
+            GetAuthRes getAuthRes = new GetAuthRes(smsService.deleteAuth(getEmailReq));
+            return new BaseResponse<>(getAuthRes);  // 인증번호 일치하게 작성한 유저 인덱스 리턴.
+        } catch(BaseException exception) {
+            return new BaseResponse<>((exception.getStatus()));
+        }
+    }
+
 
     /**
      * [아이디(=이메일) 찾기]
@@ -141,16 +162,17 @@ public class UserController {
                 return new BaseResponse<>(NOT_MATCHED_AUTH);
             }
 
-            // 일치함 -> SmsAuth 테이블에서 row 제거 & 이메일 알려준다.
-            smsService.deleteAuth(getEmailReq);
+            // 일치함 -> SmsAuth 테이블에서 row 제거 & 일치하게 입력한 유저 인덱스 리턴.
+            int permittedUserIdx = smsService.deleteAuth(getEmailReq);
 
             // 이메일 가져옴.
-            GetEmailRes getEmailRes = new GetEmailRes(userProvider.getUserEmail(getEmailReq.getUserIdx()));
+            GetEmailRes getEmailRes = new GetEmailRes(userProvider.getUserEmail(permittedUserIdx));
             return new BaseResponse<>(getEmailRes);
         } catch(BaseException exception) {
             return new BaseResponse<>((exception.getStatus()));
         }
     }
+
 
 }
 

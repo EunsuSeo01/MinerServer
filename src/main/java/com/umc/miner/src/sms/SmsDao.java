@@ -45,8 +45,10 @@ public class SmsDao {
     }
 
     // SmsAuth 테이블에서 인증된 row 제거.
-    public void deleteAuth(GetAuthReq getAuthReq) {
+    public int deleteAuth(GetAuthReq getAuthReq) {
         String deleteAuthQuery = "delete from SmsAuth where userIdx = ? and authNum = ?";
         this.jdbcTemplate.update(deleteAuthQuery, getAuthReq.getUserIdx(), getAuthReq.getAuthNum());
+
+        return getAuthReq.getUserIdx(); // 인증한 유저의 인덱스 전달.
     }
 }
