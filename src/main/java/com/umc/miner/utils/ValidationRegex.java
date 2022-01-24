@@ -28,4 +28,12 @@ public class ValidationRegex {
         return matcher.find();
     }
 
+    // 최소 8 자, 최소 하나의 문자, 하나의 숫자 및 하나의 특수 문자 -> 비밀번호
+    public static boolean isRegexPw(String target) {
+        String regex = "^(?=.*[A-Za-z])(?=.*\\d)(?=.*[$@$!%*#?&])[A-Za-z\\d$@$!%*#?&]{8,}$";
+        Pattern pattern = Pattern.compile(regex, Pattern.CASE_INSENSITIVE); // Pattern.CASE_INSENSITIVE : 대소문자 구분 X
+        Matcher matcher = pattern.matcher(target);
+        return matcher.find();
+    }
+
 }
