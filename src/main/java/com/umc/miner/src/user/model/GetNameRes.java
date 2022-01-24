@@ -8,6 +8,6 @@ import lombok.Setter;
 @Setter
 @AllArgsConstructor
 
-public class GetEmailRes {
-    private String email;
+public class GetNameRes {
+    private String nickName;
 }

@@ -25,18 +25,25 @@ public class UserService {
         this.jwtService = jwtService;
     }
 
-    // 회원가입 (POST)
-    public PostUserRes createUser(PostUserReq postUserReq) throws BaseException {
-        // email 중복 확인
-        if (userProvider.checkEmail(postUserReq.getEmail()) == 1) {
+    // email 중복확인
+    public GetEmailRes getEmail(GetEmailReq getEmailReq) throws BaseException {
+        if (userProvider.checkEmail(getEmailReq.getEmail()) == 1) {
             throw new BaseException(POST_USERS_EXISTS_EMAIL);
         }
+        throw new BaseException(POST_USERS_AVAILABLE_EMAIL);
+    }
 
-        // nickName 중복 확인
-        if (userProvider.checkNickName(postUserReq.getNickName()) == 1) {
-            throw new BaseException(POST_USERS_EXISTS_NICKNAME);
+    // nickName 중복확인
+    public GetNameRes getNickName(GetNameReq getNameReq) throws BaseException {
+        if (userProvider.checkNickName(getNameReq.getNickName()) == 1) {
+            throw new BaseException(POST_USERS_EXISTS_NAME);
         }
+        throw new BaseException(POST_USERS_AVAILABLE_NAME);
+    }
 
+
+    // 회원가입 (POST)
+    public PostUserRes createUser(PostUserReq postUserReq) throws BaseException {
         // password 암호화
         try {
             String pwd;
@@ -50,7 +57,7 @@ public class UserService {
             int userIdx = userDao.createUser(postUserReq);
             String jwt = jwtService.createJwt(userIdx); //jwt 발급
             return new PostUserRes(userIdx, jwt);
-        }catch (Exception exception) {
+        } catch (Exception exception) {
             throw new BaseException(DATABASE_ERROR);
         }
     }
