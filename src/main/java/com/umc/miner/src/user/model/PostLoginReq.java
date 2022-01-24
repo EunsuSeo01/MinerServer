@@ -2,12 +2,12 @@ package com.umc.miner.src.user.model;
 
 import lombok.*;
 
-
-@Getter // 해당 클래스에 대한 접근자 생성
-@Setter // 해당 클래스에 대한 설정자 생성
+@Getter
+@Setter
 @AllArgsConstructor
+@NoArgsConstructor(access = AccessLevel.PROTECTED)
 
-public class User {
+public class PostLoginReq {
     private int userIdx;
     private String email;
     private String password;

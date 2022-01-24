@@ -53,7 +53,7 @@ public class EmailController {
 
             // REQUEST 담기
             PostAuthNumReq postAuthNumReq = new PostAuthNumReq();
-            postAuthNumReq.setUserIdx(userProvider.getUserIdx(email.getAddress()));
+            postAuthNumReq.setUserIdx(userProvider.eGetUserIdx(email.getAddress()));
 
             // RESPONSE
             PostAuthNumRes postAuthNumRes = new PostAuthNumRes(emailService.saveEmailAuthNum(postAuthNumReq));
