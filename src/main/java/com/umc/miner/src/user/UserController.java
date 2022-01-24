@@ -107,7 +107,7 @@ public class UserController {
     /**
      * [인증번호 확인 API]
      * 회원가입 때 인증번호 일치하는지 안 하는지 확인하는 API
-     * [GET} /miner/sign-up/auth
+     * [GET} /miner/signup/auth
      */
     @GetMapping("/signup/auth")
     public BaseResponse<GetAuthRes> checkAuthNum(@RequestBody GetAuthReq getEmailReq) {
