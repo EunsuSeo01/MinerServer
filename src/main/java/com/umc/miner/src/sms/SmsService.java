@@ -121,9 +121,9 @@ public class SmsService {
     }
 
     // 인증번호 일치함 -> SmsAuth 테이블에서 row 제거.
-    public void deleteAuth(GetAuthReq getEmailReq) throws BaseException {
+    public int deleteAuth(GetAuthReq getEmailReq) throws BaseException {
         try {
-            smsDao.deleteAuth(getEmailReq);
+            return smsDao.deleteAuth(getEmailReq);
         } catch (Exception exception) {
             throw new BaseException(DATABASE_ERROR);
         }
