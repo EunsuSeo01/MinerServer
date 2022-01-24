@@ -28,7 +28,7 @@ public class UserProvider {
         this.jwtService = jwtService;
     }
 
-    // 1. 로그인 (password 검사)
+    // 로그인 (password 검사)
     public PostLoginRes logIn(PostLoginReq postLoginReq) throws BaseException {
         User user = userDao.getPwd(postLoginReq);
         String password;
@@ -50,7 +50,6 @@ public class UserProvider {
     }
 
 
-    // 2. 회원가입
     // 해당 이메일이 이미 User 테이블에 존재하는지 확인
     public int checkEmail(String email) throws BaseException {
         try {
@@ -59,6 +58,7 @@ public class UserProvider {
             throw new BaseException(UNEXPECTED_ERROR);
         }
     }
+
 
     // 해당 닉네임이 이미 User 테이블에 존재하는지 확인
     public int checkNickName(String nickName) throws BaseException {

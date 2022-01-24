@@ -32,6 +32,7 @@ public class UserService {
         this.jwtService = jwtService;
     }
 
+<<<<<<< Updated upstream
         // 회원가입 (POST)
         public PostUserRes createUser(PostUserReq postUserReq) throws BaseException {
             // email 중복 확인
@@ -60,6 +61,42 @@ public class UserService {
             }catch (Exception exception) {
                 throw new BaseException(DATABASE_ERROR);
             }
+=======
+    // email 중복확인
+    public GetEmailRes getEmail(GetEmailReq getEmailReq) throws BaseException {
+        if (userProvider.checkEmail(getEmailReq.getEmail()) == 1) {
+            throw new BaseException(POST_USERS_EXISTS_EMAIL);
+        }
+        throw new BaseException(POST_USERS_AVAILABLE_EMAIL);
+    }
+
+    // nickName 중복확인
+    public GetNameRes getNickName(GetNameReq getNameReq) throws BaseException {
+        if (userProvider.checkNickName(getNameReq.getNickName()) == 1) {
+            throw new BaseException(POST_USERS_EXISTS_NAME);
+        }
+        throw new BaseException(POST_USERS_AVAILABLE_NAME);
+    }
+
+
+    // 회원가입 (POST)
+    public PostUserRes createUser(PostUserReq postUserReq) throws BaseException {
+        // password 암호화
+        try {
+            String pwd;
+            pwd = new AES128(Secret.USER_INFO_PASSWORD_KEY).encrypt(postUserReq.getPassword()); // 암호화코드
+            postUserReq.setPassword(pwd);
+        } catch (Exception ignored) { // 암호화가 실패하였을 경우 에러 발생
+            throw new BaseException(PASSWORD_ENCRYPTION_ERROR);
+        }
+
+        try {
+            int userIdx = userDao.createUser(postUserReq);
+            String jwt = jwtService.createJwt(userIdx); //jwt 발급
+            return new PostUserRes(userIdx, jwt);
+        } catch (Exception exception) {
+            throw new BaseException(DATABASE_ERROR);
+>>>>>>> Stashed changes
         }
 
 }
