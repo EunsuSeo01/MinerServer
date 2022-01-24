@@ -81,7 +81,7 @@ public class UserController {
             return new BaseResponse<>(POST_USERS_EMPTY_EMAIL);
         }
 
-        // NickName 형식
+        // Email 형식
         if (!isRegexEmail(getEmailReq.getEmail())) {
             return new BaseResponse<>(POST_USERS_INVALID_EMAIL);
         }
@@ -98,7 +98,7 @@ public class UserController {
 
     /**
      * 닉네임 중복확인 API
-     * [GET] /miner/users/nick
+     * [GET] /miner/users/name
      */
     @ResponseBody
     @GetMapping("/name")
@@ -127,19 +127,9 @@ public class UserController {
      * 회원가입 API
      * [POST] /users/signup
      */
-
     @ResponseBody
     @PostMapping("/signup")
     public BaseResponse<PostUserRes> createUser(@RequestBody PostUserReq postUserReq) {
-        if (postUserReq.getEmail() == null) {
-            return new BaseResponse<>(POST_USERS_EMPTY_EMAIL);
-        }
-
-        // Email 형식
-        if (!isRegexEmail(postUserReq.getEmail())) {
-            return new BaseResponse<>(POST_USERS_INVALID_EMAIL);
-        }
-
         if (postUserReq.getPassword() == null) {
             return new BaseResponse<>(POST_USERS_EMPTY_PASSWORD);
         }
