@@ -1,15 +1,20 @@
 package com.umc.miner.src.user;
 
 import com.umc.miner.config.BaseException;
+
 import com.umc.miner.config.secret.Secret;
 import static com.umc.miner.config.BaseResponseStatus.*;
 import com.umc.miner.src.user.model.*;
 import com.umc.miner.utils.AES128;
+
 import com.umc.miner.utils.JwtService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+
+
+
 
 @Service
 public class UserProvider {
@@ -75,7 +80,16 @@ public class UserProvider {
         }
     }
 
-    // 유저 인덱스 가져옴.
+    // 이메일 USERIDX 가져오기
+    public int eGetUserIdx(String email) throws BaseException {
+        try {
+            return userDao.EGetUserIdx(email);
+        } catch (Exception exception) {
+            throw new BaseException(USERS_NOT_EXISTS_EMAIL);
+        }
+    }
+
+    // PhoneNum 유저 인덱스 가져옴.
     public int getUserIdx(String phoneNum) throws BaseException {
         try {
             return userDao.getUserIdx(phoneNum);
@@ -127,5 +141,4 @@ public class UserProvider {
             return addStr;
         }
     }
-
 }

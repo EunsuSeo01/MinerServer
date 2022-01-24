@@ -49,10 +49,13 @@ dependencies {
     // Validation 처리를 위해
     implementation('org.springframework.boot:spring-boot-starter-validation')
 
+
+    // email 발송
+    implementation 'org.springframework.boot:spring-boot-starter-mail'
+
     // SMS 문자 전송을 위해
     // https://mvnrepository.com/artifact/net.nurigo/javaSDK
     implementation group: 'net.nurigo', name: 'javaSDK', version: '2.2'
-
 }
 
 test {

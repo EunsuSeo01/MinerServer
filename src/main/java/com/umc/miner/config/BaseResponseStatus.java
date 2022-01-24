@@ -31,18 +31,29 @@ public enum BaseResponseStatus {
     // 이메일 중복확인
     POST_USERS_EMPTY_EMAIL(false, 2015, "이메일을 입력해주세요."),
     POST_USERS_INVALID_EMAIL(false, 2016, "이메일 형식을 확인해주세요."),
-    POST_USERS_EXISTS_EMAIL(false, 2017,"중복된 이메일입니다."),
+
+    POST_USERS_EXISTS_EMAIL(false,2017,"중복된 이메일입니다."),
+    POST_USERS_NOT_EXISTS_EMAIL(false,2031,"존재하지 않는 이메일입니다."),
+
 
     // 닉네임 중복확인
     POST_USERS_EMPTY_NAME(false, 2018, "닉네임을 입력해주세요."),
     POST_USERS_INVALID_NAME(false, 2019, "6자 미만으로 설정해주세요."),
     POST_USERS_EXISTS_NAME(false, 2020,"이미 존재하는 닉네임입니다."),
 
-    POST_USERS_EMPTY_PASSWORD(false, 2018, "비밀번호를 입력해주세요."),
-    POST_USERS_INVALID_PASSWORD(false, 2019,"비밀번호 형식을 확인해주세요."),
+    POST_USERS_EMPTY_PASSWORD(false, 2032, "비밀번호를 입력해주세요."),
+    POST_USERS_INVALID_PASSWORD(false, 2033,"비밀번호 형식을 확인해주세요."),
 
     NOT_MATCHED_AUTH(false, 2030, "인증번호가 일치하지 않습니다."),
 
+
+    // [PATCH] /users
+    PATCH_USERS_INVALID_PASSWORD(false, 2034, "비밀번호 형식을 확인해주세요."),
+    PATCH_USERS_EMPTY_EMAIL(false, 2035, "이메일을 입력해주세요."),
+
+    // [POST] /email
+    POST_EMAIL_EMPTY_EMAIL(false, 2021, "인증번호를 입력해주세요"),
+    POST_EMAIL_FAIL_EMAIL(false, 2022, "인증번호가 틀립니다."),
 
 
     /**
@@ -54,8 +65,12 @@ public enum BaseResponseStatus {
     // [POST] /users
     DUPLICATED_EMAIL(false, 3013, "중복된 이메일입니다."),
     FAILED_TO_LOGIN(false,3014,"없는 아이디거나 비밀번호가 틀렸습니다."),
+
+    USERS_NOT_EXISTS_EMAIL(false,3017,"없는 이메일 정보입니다."),
+
     NOT_REGISTERED_PHONE_NUMBER(false, 3015, "해당 전화번호로 가입된 아이디가 없습니다."),
     FAILED_TO_MSG(false, 3016, "메세지 전송에 실패하였습니다."),
+
 
 
 
@@ -68,6 +83,7 @@ public enum BaseResponseStatus {
 
     //[PATCH] /users/{userIdx}
     MODIFY_FAIL_USERNAME(false,4014,"유저네임 수정 실패"),
+    MODIFY_FAIL_PW(false,4015,"비밀번호 수정 실패"),
 
     PASSWORD_ENCRYPTION_ERROR(false, 4011, "비밀번호 암호화에 실패하였습니다."),
     PASSWORD_DECRYPTION_ERROR(false, 4012, "비밀번호 복호화에 실패하였습니다.");

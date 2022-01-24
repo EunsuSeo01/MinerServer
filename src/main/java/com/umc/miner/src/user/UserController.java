@@ -1,15 +1,16 @@
 package com.umc.miner.src.user;
 
+
+import com.umc.miner.config.BaseException;
+import com.umc.miner.config.BaseResponse;
+import com.umc.miner.src.user.model.*;
+import com.umc.miner.utils.JwtService;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
 import com.umc.miner.src.sms.SmsService;
 import com.umc.miner.src.sms.SmsProvider;
 import com.umc.miner.src.sms.model.*;
-import com.umc.miner.src.user.model.*;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-import com.umc.miner.config.BaseException;
-import com.umc.miner.config.BaseResponse;
-import com.umc.miner.utils.JwtService;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
 import static com.umc.miner.config.BaseResponseStatus.*;
@@ -21,7 +22,8 @@ import static com.umc.miner.utils.ValidationRegex.isRegexNickName;
 @RequestMapping("/miner/users")
 public class UserController {
 
-    final Logger logger = LoggerFactory.getLogger(this.getClass());
+    final Logger logger = LoggerFactory.getLogger(this.getClass()); // Log를 남기기: 일단은 모르고 넘어가셔도 무방합니다.
+
 
     @Autowired
     private final UserProvider userProvider;
@@ -29,7 +31,6 @@ public class UserController {
     private final UserService userService;
     @Autowired
     private final JwtService jwtService;
-
     @Autowired
     private final SmsProvider smsProvider;
     @Autowired
@@ -43,7 +44,6 @@ public class UserController {
         this.smsProvider = smsProvider;
         this.smsService = smsService;
     }
-
 
     /**
      * 로그인 API
@@ -66,16 +66,16 @@ public class UserController {
             PostLoginRes postLoginRes = userProvider.logIn(postLoginReq);
             return new BaseResponse<>(postLoginRes);
         } catch (BaseException exception) {
-            return new BaseResponse<>(exception.getStatus());
+            return new BaseResponse<>((exception.getStatus()));
         }
     }
 
     /**
-     * 닉네임 중복확인 API
-     * [GET] /miner/users/nick
+     * 이메일 중복확인 API
+     * [POST] /miner/users/email
      */
     @ResponseBody
-    @GetMapping("/email")
+    @PostMapping("/email")
     public BaseResponse checkEmail(@RequestBody GetEmailReq getEmailReq) {
         if (getEmailReq.getEmail() == null) {
             return new BaseResponse<>(POST_USERS_EMPTY_EMAIL);
@@ -95,13 +95,12 @@ public class UserController {
     }
 
 
-
     /**
      * 닉네임 중복확인 API
-     * [GET] /miner/users/name
+     * [POST] /miner/users/name
      */
     @ResponseBody
-    @GetMapping("/name")
+    @PostMapping("/name")
     public BaseResponse checkNickName(@RequestBody GetNameReq getNameReq) {
         if (getNameReq.getNickName() == null) {
             return new BaseResponse<>(POST_USERS_EMPTY_NAME);
@@ -119,8 +118,6 @@ public class UserController {
             return new BaseResponse<>((exception.getStatus()));
         }
     }
-
-
 
 
     /**
@@ -150,9 +147,10 @@ public class UserController {
     /**
      * [인증번호 확인 API]
      * 회원가입 때 인증번호 일치하는지 안 하는지 확인하는 API
-     * [GET} /miner/signup/auth
+     * [POST] /miner/signup/auth
      */
-    @GetMapping("/signup/auth")
+    @ResponseBody
+    @PostMapping("/signup/auth")
     public BaseResponse<GetAuthRes> checkAuthNum(@RequestBody GetAuthReq getEmailReq) {
         try {
             // 인증번호가 일치하지 않은 경우.
@@ -163,7 +161,7 @@ public class UserController {
             // 일치함 -> SmsAuth 테이블에서 row 제거.
             GetAuthRes getAuthRes = new GetAuthRes(smsService.deleteAuth(getEmailReq));
             return new BaseResponse<>(getAuthRes);  // 인증번호 일치하게 작성한 유저 인덱스 리턴.
-        } catch(BaseException exception) {
+        } catch (BaseException exception) {
             return new BaseResponse<>((exception.getStatus()));
         }
     }
@@ -172,9 +170,10 @@ public class UserController {
     /**
      * [아이디(=이메일) 찾기]
      * 일치하는 phoneNum이 있는지 확인하는 API
-     * [GET] /miner/users/phoneNum
+     * [POST] /miner/users/phoneNum
      */
-    @GetMapping("/phoneNum")
+    @ResponseBody
+    @PostMapping("/phoneNum")
     public BaseResponse<GetUserIdxRes> postMessage(@RequestBody GetUserIdxReq getUserIdxReq) {
         try {
             String phoneNum = getUserIdxReq.getPhoneNum();
@@ -195,9 +194,10 @@ public class UserController {
      * [아이디(=이메일) 찾기]
      * 이메일 보여주는 API
      * 입력한 네자리 숫자가 전송한 인증번호와 같은지 확인 -> 같으면 가려진 이메일을 보여준다.
-     * [GET] /miner/users/find-email
+     * [POST] /miner/users/find-email
      */
-    @GetMapping("/find-email")
+    @ResponseBody
+    @PostMapping("/find-email")
     public BaseResponse<GetEmailRes> getUserEmail(@RequestBody GetAuthReq getEmailReq) {
         try {
             // 인증번호가 일치하지 않은 경우.
@@ -211,11 +211,69 @@ public class UserController {
             // 이메일 가져옴.
             GetEmailRes getEmailRes = new GetEmailRes(userProvider.getUserEmail(permittedUserIdx));
             return new BaseResponse<>(getEmailRes);
-        } catch(BaseException exception) {
+        } catch (BaseException exception) {
             return new BaseResponse<>((exception.getStatus()));
         }
     }
 
+    /**
+     * 비밀번호 찾기 API
+     * [POST] /users/findPw
+     */
+    @ResponseBody
+    @PostMapping("/findPw")
+    public BaseResponse<PostFindPwRes> findPw(@RequestBody PostFindPwReq postFindPwReq) {
+        try {
+            // TODO: 로그인 값들에 대한 형식적인 validatin 처리해주셔야합니다.
+            String userEmail = postFindPwReq.getEmail();
 
+            // 빈칸일 때
+            if (userEmail == null) {
+                return new BaseResponse<>(POST_USERS_EMPTY_EMAIL);
+            }
+            // 정규화 형식 아닐 때
+            if (!isRegexEmail(userEmail)) {
+                return new BaseResponse<>(POST_USERS_INVALID_EMAIL);
+            }
+            // DB에 이메일이 없을 때
+            if (userProvider.checkEmail(userEmail) == 0) {
+                return new BaseResponse<>(POST_USERS_NOT_EXISTS_EMAIL);
+            }
+
+            PostFindPwRes postFindPwRes = new PostFindPwRes(userProvider.eGetUserIdx(userEmail));
+            return new BaseResponse<>(postFindPwRes);
+        } catch (BaseException exception) {
+            return new BaseResponse<>(exception.getStatus());
+        }
+    }
+
+
+    /**
+     * 비밀번호 변경 API
+     * [PATCH] /users/modifyPw
+     */
+    @ResponseBody
+    @PatchMapping("/modifyPw")
+    public BaseResponse<String> modifyPw(@RequestBody PatchChangePwReq patchChangePwReq) {
+        try {
+            String pw = patchChangePwReq.getPassword();
+
+            // 빈칸일 시
+            if (pw == null) {
+                return new BaseResponse<>(PATCH_USERS_EMPTY_EMAIL);
+            }
+
+            // 비밀번호 정규식
+            if (!isRegexPassword(pw)) {
+                return new BaseResponse<>(PATCH_USERS_INVALID_PASSWORD);
+            }
+
+            userService.modifyPw(patchChangePwReq);
+            String result = "비밀번호가 변경되었습니다.";
+            return new BaseResponse<>(result);
+        } catch (BaseException exception) {
+            return new BaseResponse<>(exception.getStatus());
+        }
+    }
 }
 
