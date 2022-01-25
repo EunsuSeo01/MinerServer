@@ -48,19 +48,25 @@ public class UserController {
     @ResponseBody
     @PostMapping("/login")
     public BaseResponse<PostLoginRes> logIn(@RequestBody PostLoginReq postLoginReq) {
-
-        if (postLoginReq.getEmail() == null) {
-            return new BaseResponse<>(USERS_EMPTY_USER_EMAIL);
-        }
-
-
-        if (postLoginReq.getStatus() == "inactive") {
-            return new BaseResponse<>(USERS_INACTIVE_USER_EMAIL);
-        }
-
         try {
+            if (postLoginReq.getEmail() == null) {
+                return new BaseResponse<>(USERS_EMPTY_USER_EMAIL);
+            }
+
+            // 이메일 확인
+            String email = postLoginReq.getEmail();
+            if (userProvider.getUser(email) == 0) {
+                return new BaseResponse<>(FAILED_TO_LOGIN);
+            }
+
+            // 계정 활성화 확인
+            if (postLoginReq.getStatus() == "inactive") {
+                return new BaseResponse<>(USERS_INACTIVE_USER_EMAIL);
+            }
+
             PostLoginRes postLoginRes = userProvider.logIn(postLoginReq);
             return new BaseResponse<>(postLoginRes);
+
         } catch (BaseException exception) {
             return new BaseResponse<>((exception.getStatus()));
         }

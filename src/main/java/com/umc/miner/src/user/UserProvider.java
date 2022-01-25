@@ -26,7 +26,17 @@ public class UserProvider {
         this.jwtService = jwtService;
     }
 
-    // 1. 로그인 (password 검사)
+
+    // 로그인 (email 검사)
+    public int getUser(String email) throws BaseException {
+        try {
+            return userDao.getUser(email);
+        } catch (Exception exception) {
+            throw new BaseException(UNEXPECTED_ERROR);
+        }
+    }
+
+    // 로그인 (password 검사)
     public PostLoginRes logIn(PostLoginReq postLoginReq) throws BaseException {
         User user = userDao.getPwd(postLoginReq);
         String password;
