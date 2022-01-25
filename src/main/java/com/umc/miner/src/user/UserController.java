@@ -1,16 +1,15 @@
 package com.umc.miner.src.user;
 
-
 import com.umc.miner.config.BaseException;
 import com.umc.miner.config.BaseResponse;
 import com.umc.miner.src.user.model.*;
-import com.umc.miner.utils.JwtService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import com.umc.miner.src.sms.SmsService;
 import com.umc.miner.src.sms.SmsProvider;
 import com.umc.miner.src.sms.model.*;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.*;
 
 import static com.umc.miner.config.BaseResponseStatus.*;
@@ -30,23 +29,20 @@ public class UserController {
     @Autowired
     private final UserService userService;
     @Autowired
-    private final JwtService jwtService;
-    @Autowired
     private final SmsProvider smsProvider;
     @Autowired
     private final SmsService smsService;
 
 
-    public UserController(UserProvider userProvider, UserService userService, JwtService jwtService, SmsProvider smsProvider, SmsService smsService) {
+    public UserController(UserProvider userProvider, UserService userService, SmsProvider smsProvider, SmsService smsService) {
         this.userProvider = userProvider;
         this.userService = userService;
-        this.jwtService = jwtService;
         this.smsProvider = smsProvider;
         this.smsService = smsService;
     }
 
     /**
-     * 로그인 API
+     * 로그인 API - 루시
      * [POST] /users/logIn
      */
     @ResponseBody
@@ -71,7 +67,7 @@ public class UserController {
     }
 
     /**
-     * 이메일 중복확인 API
+     * 이메일 중복확인 API - 루시
      * [POST] /miner/users/email
      */
     @ResponseBody
@@ -96,7 +92,7 @@ public class UserController {
 
 
     /**
-     * 닉네임 중복확인 API
+     * 닉네임 중복확인 API - 루시
      * [POST] /miner/users/name
      */
     @ResponseBody
@@ -121,7 +117,7 @@ public class UserController {
 
 
     /**
-     * 회원가입 API
+     * 회원가입 API - 루시
      * [POST] /users/signup
      */
     @ResponseBody
@@ -145,22 +141,22 @@ public class UserController {
     }
 
     /**
-     * [인증번호 확인 API]
+     * [인증번호 확인 API] - 서리
      * 회원가입 때 인증번호 일치하는지 안 하는지 확인하는 API
      * [POST] /miner/signup/auth
      */
     @ResponseBody
     @PostMapping("/signup/auth")
-    public BaseResponse<GetAuthRes> checkAuthNum(@RequestBody GetAuthReq getEmailReq) {
+    public BaseResponse<String> checkAuthNum(@RequestBody GetAuthReq getAuthReq) {
         try {
             // 인증번호가 일치하지 않은 경우.
-            if (smsProvider.checkAuthNum(getEmailReq) == 0) {
+            if (smsProvider.checkAuthNum(getAuthReq) == 0) {
                 return new BaseResponse<>(NOT_MATCHED_AUTH);
             }
 
             // 일치함 -> SmsAuth 테이블에서 row 제거.
-            GetAuthRes getAuthRes = new GetAuthRes(smsService.deleteAuth(getEmailReq));
-            return new BaseResponse<>(getAuthRes);  // 인증번호 일치하게 작성한 유저 인덱스 리턴.
+            String msg = smsService.deleteAuth(getAuthReq);
+            return new BaseResponse<>(msg);
         } catch (BaseException exception) {
             return new BaseResponse<>((exception.getStatus()));
         }
@@ -168,15 +164,16 @@ public class UserController {
 
 
     /**
-     * [아이디(=이메일) 찾기]
-     * 일치하는 phoneNum이 있는지 확인하는 API
+     * [아이디(=이메일) 찾기] - 서리
+     * 가입된 phoneNum인지 확인하는 API
      * [POST] /miner/users/phoneNum
      */
     @ResponseBody
     @PostMapping("/phoneNum")
-    public BaseResponse<GetUserIdxRes> postMessage(@RequestBody GetUserIdxReq getUserIdxReq) {
+    public BaseResponse<GetUserIdxRes> checkPhoneNum(@RequestBody GetUserIdxReq getUserIdxReq) {
         try {
             String phoneNum = getUserIdxReq.getPhoneNum();
+
             // DB내에 일치하는 phoneNum이 있는지 확인.
             if (userProvider.checkPhoneNum(phoneNum) == 0) {
                 return new BaseResponse<>(NOT_REGISTERED_PHONE_NUMBER);
@@ -191,25 +188,32 @@ public class UserController {
     }
 
     /**
-     * [아이디(=이메일) 찾기]
+     * [아이디(=이메일) 찾기] - 서리
      * 이메일 보여주는 API
      * 입력한 네자리 숫자가 전송한 인증번호와 같은지 확인 -> 같으면 가려진 이메일을 보여준다.
      * [POST] /miner/users/find-email
      */
+    @Transactional
     @ResponseBody
     @PostMapping("/find-email")
-    public BaseResponse<GetEmailRes> getUserEmail(@RequestBody GetAuthReq getEmailReq) {
+    public BaseResponse<GetEmailRes> getUserEmail(@RequestBody GetAuthReq getAuthReq) {
         try {
+            // DB내에 일치하는 phoneNum이 있는지 확인.
+            if (userProvider.checkPhoneNum(getAuthReq.getPhoneNum()) == 0) {
+                return new BaseResponse<>(NOT_REGISTERED_PHONE_NUMBER);
+            }
+
             // 인증번호가 일치하지 않은 경우.
-            if (smsProvider.checkAuthNum(getEmailReq) == 0) {
+            if (smsProvider.checkAuthNum(getAuthReq) == 0) {
                 return new BaseResponse<>(NOT_MATCHED_AUTH);
             }
 
             // 일치함 -> SmsAuth 테이블에서 row 제거 & 일치하게 입력한 유저 인덱스 리턴.
-            int permittedUserIdx = smsService.deleteAuth(getEmailReq);
+            smsService.deleteAuth(getAuthReq);
+            String permittedPhoneNum = getAuthReq.getPhoneNum();
 
             // 이메일 가져옴.
-            GetEmailRes getEmailRes = new GetEmailRes(userProvider.getUserEmail(permittedUserIdx));
+            GetEmailRes getEmailRes = new GetEmailRes(userProvider.getUserEmail(permittedPhoneNum));
             return new BaseResponse<>(getEmailRes);
         } catch (BaseException exception) {
             return new BaseResponse<>((exception.getStatus()));

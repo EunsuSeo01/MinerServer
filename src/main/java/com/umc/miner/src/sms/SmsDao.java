@@ -24,31 +24,26 @@ public class SmsDao {
     }
 
     // 인증문자 관련 정보를 테이블에 추가한다.
-    public int postSmsAuth(PostSmsAuthReq postSmsAuthReq) {
-        String postSmsAuthQuery = "insert into SmsAuth (userIdx, authNum) values (?,?)";
+    public void postSmsAuth(PostSmsAuthReq postSmsAuthReq) {
+        String postSmsAuthQuery = "insert into SmsAuth (phoneNum, authNum) values (?,?)";
         Object[] postSmsAuthParams = new Object[]{
-                postSmsAuthReq.getUserIdx(), postSmsAuthReq.getAuthNum()
+                postSmsAuthReq.getPhoneNum(), postSmsAuthReq.getAuthNum()
         };
 
         this.jdbcTemplate.update(postSmsAuthQuery, postSmsAuthParams);
-
-        String lastInsertIdQuery = "select last_insert_id()";
-        return this.jdbcTemplate.queryForObject(lastInsertIdQuery, int.class);
     }
 
     // 인증번호가 일치하는지 확인.
     public int checkAuthNum(GetAuthReq getAuthReq) {
-        String checkAuthNumQuery = "select exists(select authIdx from SmsAuth where userIdx = ? AND authNum = ?)";
+        String checkAuthNumQuery = "select exists(select authIdx from SmsAuth where phoneNum = ? AND authNum = ?)";
 
         return this.jdbcTemplate.queryForObject(checkAuthNumQuery, int.class,
-                getAuthReq.getUserIdx(), getAuthReq.getAuthNum()); // 쿼리문의 결과(존재하지 않음(False,0),존재함(True, 1))를 int형(0,1)으로 반환됩니다.
+                getAuthReq.getPhoneNum(), getAuthReq.getAuthNum()); // 쿼리문의 결과(존재하지 않음(False,0),존재함(True, 1))를 int형(0,1)으로 반환됩니다.
     }
 
     // SmsAuth 테이블에서 인증된 row 제거.
-    public int deleteAuth(GetAuthReq getAuthReq) {
-        String deleteAuthQuery = "delete from SmsAuth where userIdx = ? and authNum = ?";
-        this.jdbcTemplate.update(deleteAuthQuery, getAuthReq.getUserIdx(), getAuthReq.getAuthNum());
-
-        return getAuthReq.getUserIdx(); // 인증한 유저의 인덱스 전달.
+    public void deleteAuth(GetAuthReq getAuthReq) {
+        String deleteAuthQuery = "delete from SmsAuth where phoneNum = ? and authNum = ?";
+        this.jdbcTemplate.update(deleteAuthQuery, getAuthReq.getPhoneNum(), getAuthReq.getAuthNum());
     }
 }

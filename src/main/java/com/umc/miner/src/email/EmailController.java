@@ -4,7 +4,6 @@ import com.umc.miner.config.BaseException;
 import com.umc.miner.config.BaseResponse;
 import com.umc.miner.src.email.model.*;
 import com.umc.miner.src.user.UserProvider;
-import com.umc.miner.src.user.model.PostFindPwRes;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
