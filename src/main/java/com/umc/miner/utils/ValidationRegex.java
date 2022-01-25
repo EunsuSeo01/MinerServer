@@ -6,7 +6,7 @@ import java.util.regex.Pattern;
 public class ValidationRegex {
     // 전화번호
     public static boolean isRegexPhoneNum(String target) {
-        String regex = "^01(?:0|1|[6-9])-(?:\\d{3}|\\d{4})-\\d{4}$";
+        String regex = "^01(?:0|1|[6-9])(?:\\d{3}|\\d{4})\\d{4}$";
         Pattern pattern = Pattern.compile(regex); // compile(String regex) : 주어진 정규 표현식으로부터 패턴 생성
         Matcher matcher = pattern.matcher(target);
         return matcher.find(); // find() : 대상 문자열과 패턴이 일치하는 경우 true 반환

@@ -41,10 +41,13 @@ public enum BaseResponseStatus {
     POST_USERS_INVALID_NAME(false, 2019, "6자 미만으로 설정해주세요."),
     POST_USERS_EXISTS_NAME(false, 2020,"이미 존재하는 닉네임입니다."),
 
-    POST_USERS_EMPTY_PASSWORD(false, 2032, "비밀번호를 입력해주세요."),
-    POST_USERS_INVALID_PASSWORD(false, 2033,"비밀번호 형식을 확인해주세요."),
+    // 전화번호 형식 확인
+    INVALID_PHONENUM(false, 2025, "전화번호 형식을 확인해주세요."),
 
     NOT_MATCHED_AUTH(false, 2030, "인증번호가 일치하지 않습니다."),
+
+    POST_USERS_EMPTY_PASSWORD(false, 2032, "비밀번호를 입력해주세요."),
+    POST_USERS_INVALID_PASSWORD(false, 2033,"비밀번호 형식을 확인해주세요."),
 
 
     // [PATCH] /users

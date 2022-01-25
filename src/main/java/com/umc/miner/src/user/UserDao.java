@@ -1,6 +1,5 @@
 package com.umc.miner.src.user;
 
-
 import com.umc.miner.src.user.model.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.jdbc.core.JdbcTemplate;
@@ -93,10 +92,9 @@ public class UserDao {
         return this.jdbcTemplate.queryForObject(getUserIdxQuery, int.class, phoneNum);
     }
 
-    // 이메일 알려준다.
-    public String getUserEmail(int userIdx) {
-        String getEmailQuery = "select email from User where userIdx = ?";
-        return this.jdbcTemplate.queryForObject(getEmailQuery, String.class, userIdx);
-
+    // 해당 핸드폰 번호를 가진 유저의 이메일을 알려준다.
+    public String getUserEmail(String permittedPhoneNum) {
+        String getEmailQuery = "select email from User where phoneNum = ?";
+        return this.jdbcTemplate.queryForObject(getEmailQuery, String.class, permittedPhoneNum);
     }
 }

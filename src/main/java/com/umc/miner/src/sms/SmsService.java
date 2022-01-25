@@ -112,18 +112,21 @@ public class SmsService {
 
 
     // 인증문자 정보 저장.
-    public int postSmsAuth(PostSmsAuthReq postSmsAuthReq) throws BaseException {
+    public void postSmsAuth(PostSmsAuthReq postSmsAuthReq) throws BaseException {
         try {
-            return smsDao.postSmsAuth(postSmsAuthReq);
+            smsDao.postSmsAuth(postSmsAuthReq);
         } catch (Exception exception) {
             throw new BaseException(DATABASE_ERROR);
         }
     }
 
     // 인증번호 일치함 -> SmsAuth 테이블에서 row 제거.
-    public int deleteAuth(GetAuthReq getEmailReq) throws BaseException {
+    public String deleteAuth(GetAuthReq getAuthReq) throws BaseException {
         try {
-            return smsDao.deleteAuth(getEmailReq);
+            smsDao.deleteAuth(getAuthReq);
+
+            String msg = "인증이 완료되었습니다.";
+            return msg;
         } catch (Exception exception) {
             throw new BaseException(DATABASE_ERROR);
         }
