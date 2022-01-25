@@ -30,7 +30,7 @@ public class EmailController {
     }
 
     /**
-     * Email 인증번호 전송 API
+     * Email 인증번호 전송 API - 릴라
      * [POST] /email/emailSend
      */
     @ResponseBody
@@ -64,7 +64,7 @@ public class EmailController {
     }
 
     /**
-     * 인증번호 비교 API
+     * 인증번호 비교 API - 릴라
      * [POST] /email/compareAuth
      */
     @ResponseBody

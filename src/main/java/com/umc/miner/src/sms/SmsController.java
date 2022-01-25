@@ -3,7 +3,6 @@ package com.umc.miner.src.sms;
 import com.umc.miner.config.BaseException;
 import com.umc.miner.config.BaseResponse;
 import com.umc.miner.src.sms.model.*;
-import com.umc.miner.src.user.UserProvider;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -27,12 +26,9 @@ public class SmsController {
 
     @Autowired
     private final SmsService smsService;
-    @Autowired
-    private final UserProvider userProvider;
 
-    public SmsController(SmsService smsService, UserProvider userProvider) {
+    public SmsController(SmsService smsService) {
         this.smsService = smsService;
-        this.userProvider = userProvider;
     }
 
     /**

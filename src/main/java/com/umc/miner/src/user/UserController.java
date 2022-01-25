@@ -204,11 +204,6 @@ public class UserController {
     @PostMapping("/find-email")
     public BaseResponse<GetEmailRes> getUserEmail(@RequestBody GetAuthReq getAuthReq) {
         try {
-            // DB내에 일치하는 phoneNum이 있는지 확인.
-            if (userProvider.checkPhoneNum(getAuthReq.getPhoneNum()) == 0) {
-                return new BaseResponse<>(NOT_REGISTERED_PHONE_NUMBER);
-            }
-
             // 인증번호가 일치하지 않은 경우.
             if (smsProvider.checkAuthNum(getAuthReq) == 0) {
                 return new BaseResponse<>(NOT_MATCHED_AUTH);
@@ -227,14 +222,13 @@ public class UserController {
     }
 
     /**
-     * 비밀번호 찾기 API
+     * 비밀번호 찾기 API - 릴라
      * [POST] /users/findPw
      */
     @ResponseBody
     @PostMapping("/findPw")
     public BaseResponse<PostFindPwRes> findPw(@RequestBody PostFindPwReq postFindPwReq) {
         try {
-            // TODO: 로그인 값들에 대한 형식적인 validatin 처리해주셔야합니다.
             String userEmail = postFindPwReq.getEmail();
 
             // 빈칸일 때
@@ -259,7 +253,7 @@ public class UserController {
 
 
     /**
-     * 비밀번호 변경 API
+     * 비밀번호 변경 API - 릴라
      * [PATCH] /users/modifyPw
      */
     @ResponseBody
