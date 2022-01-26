@@ -1,26 +1,25 @@
-package com.umc.miner.src.playmap;
+package com.umc.miner.src.play;
 
 import com.umc.miner.config.BaseException;
 import com.umc.miner.config.BaseResponse;
-import com.umc.miner.src.playmap.model.*;
+import com.umc.miner.src.play.model.*;
 import com.umc.miner.utils.Pagination;
 import org.jetbrains.annotations.NotNull;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.*;
 
 @RestController
 @RequestMapping("/miner/playmaps")
-public class PlayMapController {
+public class PlayController {
     final Logger logger = LoggerFactory.getLogger(this.getClass());
 
-    private final PlayMapProvider playMapProvider;
+    private final PlayProvider playProvider;
 
     @Autowired
-    public PlayMapController(PlayMapProvider playMapProvider) {
-        this.playMapProvider = playMapProvider;
+    public PlayController(PlayProvider playProvider) {
+        this.playProvider = playProvider;
     }
 
     /**
@@ -34,9 +33,9 @@ public class PlayMapController {
             int mapNumPerPage = 4;  // 한 페이지에 4개씩 조회되도록. mapNumPerPage = 한 페이지당 맵의 개수.
 
             Pagination paging = new Pagination(getPagingReq.getPageNo(), mapNumPerPage);
-            paging.pageInfo(playMapProvider.getTotalNumOfPlayMap());
+            paging.pageInfo(playProvider.getTotalNumOfPlayMap());
 
-            GetPagingRes result = new GetPagingRes(playMapProvider.getPlayMap(getPagingReq, mapNumPerPage), paging);
+            GetPagingRes result = new GetPagingRes(playProvider.getPlayMap(getPagingReq, mapNumPerPage), paging);
             return new BaseResponse(result);
         } catch (BaseException exception) {
             return new BaseResponse<>((exception.getStatus()));

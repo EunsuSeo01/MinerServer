@@ -1,6 +1,6 @@
-package com.umc.miner.src.playmap;
+package com.umc.miner.src.play;
 
-import com.umc.miner.src.playmap.model.*;
+import com.umc.miner.src.play.model.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.stereotype.Repository;
@@ -9,7 +9,7 @@ import javax.sql.DataSource;
 import java.util.List;
 
 @Repository
-public class PlayMapDao {
+public class PlayDao {
     private JdbcTemplate jdbcTemplate;
 
     @Autowired

@@ -1,4 +1,4 @@
-package com.umc.miner.src.playmap.model;
+package com.umc.miner.src.play.model;
 
 import lombok.*;
 import java.util.List;
