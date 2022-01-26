@@ -9,5 +9,5 @@ import lombok.Setter;
 @Setter
 @AllArgsConstructor
 public class PostAuthNumRes {
-    private int authIdx;
+    private int userIdx;
 }

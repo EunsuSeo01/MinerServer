@@ -38,11 +38,8 @@ public class EmailController {
     @PostMapping("/emailSend")
     public BaseResponse<PostAuthNumRes> sendMail(@RequestBody Email email) {
         try {
-            // 메일 전송
-            this.emailService.mailSend(email);
-
             // 이메일 null
-            if(email.getAddress() == null){
+            if (email.getAddress() == null) {
                 return new BaseResponse<>(POST_USERS_EMPTY_EMAIL);
             }
 
@@ -55,8 +52,11 @@ public class EmailController {
             PostAuthNumReq postAuthNumReq = new PostAuthNumReq();
             postAuthNumReq.setUserIdx(userProvider.eGetUserIdx(email.getAddress()));
 
-            // RESPONSE
+            // RESPONSE(AuthNum DB에 임시저장) -> userIdx
             PostAuthNumRes postAuthNumRes = new PostAuthNumRes(emailService.saveEmailAuthNum(postAuthNumReq));
+
+            // 메일 전송
+            this.emailService.mailSend(email);
 
             return new BaseResponse<>(postAuthNumRes);
         } catch (BaseException exception) {
