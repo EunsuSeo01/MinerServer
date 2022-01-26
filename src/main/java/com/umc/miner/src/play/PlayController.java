@@ -78,14 +78,14 @@ public class PlayController {
      * @param postLoadPlayReq
      * @return
      */
-    @ResponseBody
+    /*@ResponseBody
     @PostMapping("/loadPlayInfo")
     public BaseResponse<String> loadPlayInfo(@RequestBody PostLoadPlayReq postLoadPlayReq) {
         PostLoadPlayRes postLoadPlayRes = new PostLoadPlayRes();
 
         try {
-//            int gegegege = playProvider.loadPlayInfo(postLoadPlayReq);
-//            System.out.println(gegegege + "어떻게 나오나용");
+            int gegegege = playProvider.loadPlayInfo(postLoadPlayReq);
+            System.out.println(gegegege + "어떻게 나오나용");
 
             // 빈칸일 시 -> 그럴일은 없을 듯 하긴 함
             if (postLoadPlayReq.getMapName() == null || postLoadPlayReq.getEditorName() == null) {
@@ -103,9 +103,9 @@ public class PlayController {
 
 
             // playTimeIdx로 playMap을 찾을 수 없는 거
-//            if (playProvider.loadPlayInfo(postLoadPlayReq) == 0) {
-//
-//            }
+            if (playProvider.loadPlayInfo(postLoadPlayReq) == 0) {
+
+            }
 
             String result = "쿠쿠루 삥뽕빵";
             return new BaseResponse<>(result);
@@ -114,4 +114,5 @@ public class PlayController {
             return new BaseResponse<>((exception.getStatus()));
         }
     }
+    */
 }
