@@ -97,4 +97,10 @@ public class UserDao {
         String getEmailQuery = "select email from User where phoneNum = ?";
         return this.jdbcTemplate.queryForObject(getEmailQuery, String.class, permittedPhoneNum);
     }
+
+    // nickName의 userIdx 찾기
+    public int getEditorIdx(String nickName) {
+        String getNickIdxQuery = "select userIdx from User where nickName = ?";
+        return this.jdbcTemplate.queryForObject(getNickIdxQuery, int.class, nickName);
+    }
 }

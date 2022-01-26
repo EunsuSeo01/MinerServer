@@ -23,9 +23,14 @@ public class PlayProvider {
     }
 
     // 공유된 맵이 총 몇 개인지 알려준다.
-    public int getTotalNumOfPlayMap() throws BaseException {
+    public int getTotalNumOfPlayMap(GetPagingReq getPagingReq) throws BaseException {
         try {
-            return playDao.getTotalNumOfPlayMap();
+            if (getPagingReq.getSearchContent() != null) {
+                return playDao.getSearchedNumOfPlayMap(getPagingReq);
+            }
+            else {
+                return playDao.getTotalNumOfPlayMap();
+            }
         } catch(Exception exception) {
             throw new BaseException(DATABASE_ERROR);
         }
@@ -34,6 +39,10 @@ public class PlayProvider {
     // 공유된 맵들을 페이징 처리해서 보여준다.
     public List<GetPlayMapRes> getPlayMap(GetPagingReq getPagingReq, int mapNumPerPage) throws BaseException {
         try {
+            if (getPagingReq.getSearchContent() != null) {
+                return playDao.getSearchPlayMap(getPagingReq, mapNumPerPage);
+            }
+
             return playDao.getPlayMap(getPagingReq, mapNumPerPage);
         } catch(Exception exception) {
             throw new BaseException(DATABASE_ERROR);

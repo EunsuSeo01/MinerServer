@@ -33,7 +33,27 @@ public class PlayController {
             int mapNumPerPage = 4;  // 한 페이지에 4개씩 조회되도록. mapNumPerPage = 한 페이지당 맵의 개수.
 
             Pagination paging = new Pagination(getPagingReq.getPageNo(), mapNumPerPage);
-            paging.pageInfo(playProvider.getTotalNumOfPlayMap());
+            paging.pageInfo(playProvider.getTotalNumOfPlayMap(getPagingReq));
+
+            GetPagingRes result = new GetPagingRes(playProvider.getPlayMap(getPagingReq, mapNumPerPage), paging);
+            return new BaseResponse(result);
+        } catch (BaseException exception) {
+            return new BaseResponse<>((exception.getStatus()));
+        }
+    }
+
+    /**
+     * 검색 결과를 페이징 처리해서 보여주는 API
+     * [POST] /miner/playmaps/search
+     */
+    @ResponseBody
+    @PostMapping("/search")
+    public BaseResponse<GetPagingRes> getSearch(@RequestBody @NotNull GetPagingReq getPagingReq) {
+        try {
+            int mapNumPerPage = 4;  // 한 페이지에 4개씩 조회되도록. mapNumPerPage = 한 페이지당 맵의 개수.
+
+            Pagination paging = new Pagination(getPagingReq.getPageNo(), mapNumPerPage);
+            paging.pageInfo(playProvider.getTotalNumOfPlayMap(getPagingReq));
 
             GetPagingRes result = new GetPagingRes(playProvider.getPlayMap(getPagingReq, mapNumPerPage), paging);
             return new BaseResponse(result);
