@@ -121,12 +121,18 @@ public class SmsService {
     }
 
     // 인증번호 일치함 -> SmsAuth 테이블에서 row 제거.
-    public String deleteAuth(GetAuthReq getAuthReq) throws BaseException {
+    public void deleteRightAuth(GetAuthReq getAuthReq) throws BaseException {
         try {
-            smsDao.deleteAuth(getAuthReq);
+            smsDao.deleteRightAuth(getAuthReq);
+        } catch (Exception exception) {
+            throw new BaseException(DATABASE_ERROR);
+        }
+    }
 
-            String msg = "인증이 완료되었습니다.";
-            return msg;
+    // 인증번호 일치 여부 확인 전에 인증번호를 더 수신받았을 때 이전의 인증번호 정보들을 SmsAuth 테이블에서 제거.
+    public void deletePrevAuth(String phoneNum) throws BaseException {
+        try {
+            smsDao.deletePrevAuth(phoneNum);
         } catch (Exception exception) {
             throw new BaseException(DATABASE_ERROR);
         }
