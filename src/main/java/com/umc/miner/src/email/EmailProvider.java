@@ -28,7 +28,7 @@ public class EmailProvider {
 
     public int deleteAuth(PostCompareAuthReq postCompareAuthReq) throws BaseException {
         try {
-            System.out.println(emailDao.deleteAuth(postCompareAuthReq)+ "뭐하냐");
+            System.out.println(emailDao.deleteAuth(postCompareAuthReq) + "뭐하냐");
             return emailDao.deleteAuth(postCompareAuthReq);
         } catch (Exception exception) {
             throw new BaseException(DATABASE_ERROR);

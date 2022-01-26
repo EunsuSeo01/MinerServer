@@ -51,7 +51,8 @@ public class EmailService {
     public int saveEmailAuthNum(PostAuthNumReq postAuthNumReq) throws BaseException {
         try {
             postAuthNumReq.setEmailAuthNum(randomAuthNum);
-            return emailDao.saveEmailAuthNum(postAuthNumReq);
+            emailDao.saveEmailAuthNum(postAuthNumReq);
+            return postAuthNumReq.getUserIdx();
         } catch (Exception exception) {
             throw new BaseException(DATABASE_ERROR);
         }

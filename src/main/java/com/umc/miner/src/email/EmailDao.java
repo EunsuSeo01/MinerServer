@@ -30,11 +30,13 @@ public class EmailDao {
         return this.jdbcTemplate.queryForObject(lastInsertIdQuery, int.class);
     }
 
+    // AuthNum 비교하기
     public int compareAuth(PostCompareAuthReq postCompareAuthReq) {
         String compareAuthQuery = "select exists(select authIdx from EmailAuthNum where emailAuthNum = ? )";
         return this.jdbcTemplate.queryForObject(compareAuthQuery, int.class, postCompareAuthReq.getAuthNum()); // 쿼리문의 결과(존재하지 않음(False,0),존재함(True, 1))를 int형(0,1)으로 반환됩니다.
     }
 
+    // AuthNum 일치시 delete
     public int deleteAuth(PostCompareAuthReq postCompareAuthReq) {
         String deleteAuthQuery = "delete from EmailAuthNum where userIdx = ? and emailAuthNum = ?";
         this.jdbcTemplate.update(deleteAuthQuery, postCompareAuthReq.getUserIdx(), postCompareAuthReq.getAuthNum());
