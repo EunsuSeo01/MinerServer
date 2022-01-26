@@ -7,13 +7,7 @@ import org.springframework.stereotype.Repository;
 
 import javax.sql.DataSource;
 
-@Repository //  [Persistence Layer에서 DAO를 명시하기 위해 사용]
-
-/**
- * DAO란?
- * 데이터베이스 관련 작업을 전담하는 클래스
- * 데이터베이스에 연결하여, 입력 , 수정, 삭제, 조회 등의 작업을 수행
- */
+@Repository
 public class SmsDao {
 
     private JdbcTemplate jdbcTemplate;

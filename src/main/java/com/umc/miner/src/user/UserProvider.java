@@ -147,4 +147,13 @@ public class UserProvider {
             return addStr;
         }
     }
+
+    //nickName userIdx 가져옴
+    public int getEditorIdx(String nickName) throws BaseException {
+        try {
+            return userDao.getEditorIdx(nickName);
+        } catch (Exception exception) {
+            throw new BaseException(DATABASE_ERROR);
+        }
+    }
 }
