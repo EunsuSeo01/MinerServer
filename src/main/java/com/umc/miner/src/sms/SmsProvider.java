@@ -30,9 +30,18 @@ public class SmsProvider {
     }
 
     // 인증번호 일치 여부 확인.
-    public int checkAuthNum(GetAuthReq getAuthReq) throws BaseException {
+    public int checkRightAuthNum(GetAuthReq getAuthReq) throws BaseException {
         try {
-            return smsDao.checkAuthNum(getAuthReq);
+            return smsDao.checkRightAuthNum(getAuthReq);
+        } catch(Exception exception) {
+            throw new BaseException(DATABASE_ERROR);
+        }
+    }
+
+    // 이전에 수신받은 인증번호가 있는지 확인.
+    public int checkPrevAuthNum(String phoneNum) throws BaseException {
+        try {
+            return smsDao.checkPrevAuthNum(phoneNum);
         } catch(Exception exception) {
             throw new BaseException(DATABASE_ERROR);
         }

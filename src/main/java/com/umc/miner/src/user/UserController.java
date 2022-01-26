@@ -156,13 +156,13 @@ public class UserController {
     public BaseResponse<String> checkAuthNum(@RequestBody GetAuthReq getAuthReq) {
         try {
             // 인증번호가 일치하지 않은 경우.
-            if (smsProvider.checkAuthNum(getAuthReq) == 0) {
+            if (smsProvider.checkRightAuthNum(getAuthReq) == 0) {
                 return new BaseResponse<>(NOT_MATCHED_AUTH);
             }
 
             // 일치함 -> SmsAuth 테이블에서 row 제거.
-            String msg = smsService.deleteAuth(getAuthReq);
-            return new BaseResponse<>(msg);
+            smsService.deleteRightAuth(getAuthReq);
+            return new BaseResponse<>("인증이 완료되었습니다.");
         } catch (BaseException exception) {
             return new BaseResponse<>((exception.getStatus()));
         }
@@ -205,12 +205,12 @@ public class UserController {
     public BaseResponse<GetEmailRes> getUserEmail(@RequestBody GetAuthReq getAuthReq) {
         try {
             // 인증번호가 일치하지 않은 경우.
-            if (smsProvider.checkAuthNum(getAuthReq) == 0) {
+            if (smsProvider.checkRightAuthNum(getAuthReq) == 0) {
                 return new BaseResponse<>(NOT_MATCHED_AUTH);
             }
 
             // 일치함 -> SmsAuth 테이블에서 row 제거 & 일치하게 입력한 유저 인덱스 리턴.
-            smsService.deleteAuth(getAuthReq);
+            smsService.deleteRightAuth(getAuthReq);
             String permittedPhoneNum = getAuthReq.getPhoneNum();
 
             // 이메일 가져옴.
