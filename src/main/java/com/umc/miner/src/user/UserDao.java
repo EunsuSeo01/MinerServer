@@ -1,6 +1,5 @@
 package com.umc.miner.src.user;
 
-
 import com.umc.miner.src.user.model.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.jdbc.core.JdbcTemplate;
@@ -18,7 +17,13 @@ public class UserDao {
         this.jdbcTemplate = new JdbcTemplate(dataSource);
     }
 
-    // 1. 로그인 ?email=
+
+    // 로그인
+    public int getUser(String email) {
+        String getUserQuery = "select exists(select email from User where email = ?)"; // User Table에 해당 email 값을 갖는 유저 정보가 존재하는가?
+        return this.jdbcTemplate.queryForObject(getUserQuery, int.class, email);  // checkEmailQuery, checkEmailParams를 통해 가져온 값(intgud)을 반환한다. -> 쿼리문의 결과(존재하지 않음(False,0),존재함(True, 1))를 int형(0,1)으로 반환됩니다.
+    }
+
     public User getPwd(PostLoginReq postLoginReq) {
         String getPwdQuery = "select userIdx, email, password, nickName, status from User where email = ?"; // 해당 email을 만족하는 User의 정보들을 조회한다.
         String getPwdParams = postLoginReq.getEmail(); // 주입될 email값을 클라이언트의 요청에서 주어진 정보를 통해 가져온다.
@@ -87,15 +92,22 @@ public class UserDao {
         return this.jdbcTemplate.queryForObject(getUserIdxQuery, int.class, phoneNum);
     }
 
+
     // 이메일 알려준다.
-    public String getUserEmail(int userIdx) {
-        String getEmailQuery = "select email from User where userIdx = ?";
-        return this.jdbcTemplate.queryForObject(getEmailQuery, String.class, userIdx);
-    }
+//    public String getUserEmail(int userIdx) {
+//        String getEmailQuery = "select email from User where userIdx = ?";
+//        return this.jdbcTemplate.queryForObject(getEmailQuery, String.class, userIdx);
+//    }
 
     // nickName의 userIdx 찾기
     public int getEditorIdx(String nickName) {
         String getNickIdxQuery = "select userIdx from User where nickName = ?";
         return this.jdbcTemplate.queryForObject(getNickIdxQuery, int.class, nickName);
+    }
+
+    // 해당 핸드폰 번호를 가진 유저의 이메일을 알려준다.
+    public String getUserEmail(String permittedPhoneNum) {
+        String getEmailQuery = "select email from User where phoneNum = ?";
+        return this.jdbcTemplate.queryForObject(getEmailQuery, String.class, permittedPhoneNum);
     }
 }

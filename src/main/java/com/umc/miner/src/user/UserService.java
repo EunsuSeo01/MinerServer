@@ -2,9 +2,6 @@ package com.umc.miner.src.user;
 
 import com.umc.miner.config.BaseException;
 import com.umc.miner.config.secret.Secret;
-
-import static com.umc.miner.config.BaseResponseStatus.*;
-
 import com.umc.miner.src.user.model.*;
 import com.umc.miner.utils.*;
 import org.slf4j.Logger;
@@ -12,6 +9,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import static com.umc.miner.config.BaseResponseStatus.*;
 
 @Service
 public class UserService {
@@ -28,7 +26,7 @@ public class UserService {
         this.jwtService = jwtService;
     }
 
-
+    // 비밀번호 변경
     public void modifyPw(PatchChangePwReq patchChangePwReq) throws BaseException {
         String encodingPw;
         try {

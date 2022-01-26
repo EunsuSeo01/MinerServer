@@ -3,15 +3,11 @@ package com.umc.miner.src.email;
 import com.umc.miner.config.BaseException;
 import com.umc.miner.src.email.model.Email;
 import com.umc.miner.src.email.model.PostAuthNumReq;
-import com.umc.miner.src.user.UserDao;
-import com.umc.miner.src.user.UserProvider;
-import com.umc.miner.utils.JwtService;
 import lombok.AllArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.mail.SimpleMailMessage;
 import org.springframework.mail.javamail.JavaMailSender;
 import org.springframework.stereotype.Service;
-import org.springframework.web.bind.annotation.RequestBody;
 
 import java.util.Random;
 

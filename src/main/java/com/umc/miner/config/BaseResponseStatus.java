@@ -24,7 +24,7 @@ public enum BaseResponseStatus {
     INVALID_JWT(false, 2002, "유효하지 않은 JWT입니다."),
     INVALID_USER_JWT(false, 2003,"권한이 없는 유저의 접근입니다."),
 
-    // users
+    // 로그인
     USERS_EMPTY_USER_EMAIL(false, 2010, "이메일을 입력해주세요."),
     USERS_INACTIVE_USER_EMAIL(false, 2012,"활성화된 계정이 아닙니다."),
 
@@ -41,10 +41,13 @@ public enum BaseResponseStatus {
     POST_USERS_INVALID_NAME(false, 2019, "6자 미만으로 설정해주세요."),
     POST_USERS_EXISTS_NAME(false, 2020,"이미 존재하는 닉네임입니다."),
 
-    POST_USERS_EMPTY_PASSWORD(false, 2032, "비밀번호를 입력해주세요."),
-    POST_USERS_INVALID_PASSWORD(false, 2033,"비밀번호 형식을 확인해주세요."),
+    // 전화번호 형식 확인
+    INVALID_PHONENUM(false, 2025, "전화번호 형식을 확인해주세요."),
 
     NOT_MATCHED_AUTH(false, 2030, "인증번호가 일치하지 않습니다."),
+
+    POST_USERS_EMPTY_PASSWORD(false, 2032, "비밀번호를 입력해주세요."),
+    POST_USERS_INVALID_PASSWORD(false, 2033,"비밀번호 형식을 확인해주세요."),
 
 
     // [PATCH] /users

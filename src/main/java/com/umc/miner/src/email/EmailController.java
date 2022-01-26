@@ -4,7 +4,6 @@ import com.umc.miner.config.BaseException;
 import com.umc.miner.config.BaseResponse;
 import com.umc.miner.src.email.model.*;
 import com.umc.miner.src.user.UserProvider;
-import com.umc.miner.src.user.model.PostFindPwRes;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -31,7 +30,7 @@ public class EmailController {
     }
 
     /**
-     * Email 인증번호 전송 API
+     * Email 인증번호 전송 API - 릴라
      * [POST] /email/emailSend
      */
     @ResponseBody
@@ -65,7 +64,7 @@ public class EmailController {
     }
 
     /**
-     * 인증번호 비교 API
+     * 인증번호 비교 API - 릴라
      * [POST] /email/compareAuth
      */
     @ResponseBody
