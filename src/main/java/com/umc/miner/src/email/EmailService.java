@@ -35,8 +35,6 @@ public class EmailService {
     public void mailSend(Email email) {
         SimpleMailMessage message = new SimpleMailMessage();
 
-        randomAuthNum = makeRandomAuthNum();
-
         String emailTitle = "[Miner] 비밀번호 변경";
         String emailMessage = "인증번호는 " + randomAuthNum + " 입니다";
 
@@ -50,6 +48,7 @@ public class EmailService {
 
     public int saveEmailAuthNum(PostAuthNumReq postAuthNumReq) throws BaseException {
         try {
+            randomAuthNum = makeRandomAuthNum();
             postAuthNumReq.setEmailAuthNum(randomAuthNum);
             emailDao.saveEmailAuthNum(postAuthNumReq);
             return postAuthNumReq.getUserIdx();
