@@ -117,6 +117,16 @@ public class UserProvider {
         }
     }
 
+    //nickName userIdx(=editorIdx) 가져옴
+    public int getEditorIdx(String nickName) throws BaseException {
+        try {
+            return userDao.getEditorIdx(nickName);
+        } catch (Exception exception) {
+            throw new BaseException(DATABASE_ERROR);
+        }
+    }
+
+
     // Asterisk로 이메일 앞 뒤 가리기.
     private static final String HIDE_CHAR = "*";
 

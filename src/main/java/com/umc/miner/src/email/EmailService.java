@@ -3,7 +3,7 @@ package com.umc.miner.src.email;
 import com.umc.miner.config.BaseException;
 import com.umc.miner.src.email.model.Email;
 import com.umc.miner.src.email.model.PostAuthNumReq;
-import com.umc.miner.src.user.UserDao;
+
 import com.umc.miner.src.user.UserProvider;
 import com.umc.miner.utils.JwtService;
 import lombok.AllArgsConstructor;

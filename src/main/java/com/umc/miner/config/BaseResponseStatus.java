@@ -55,6 +55,11 @@ public enum BaseResponseStatus {
     POST_EMAIL_EMPTY_EMAIL(false, 2021, "인증번호를 입력해주세요"),
     POST_EMAIL_FAIL_EMAIL(false, 2022, "인증번호가 틀립니다."),
 
+    // Play API
+    // [PATCH] /play
+    FAILED_TO_MODIFY_SHARED_MAP(false, 2050, "공유 수정에 실패하였습니다."),
+    FAILED_TO_DELETE_SHARED_MAP(false, 2051, "공유 삭제에 실패하였습니다."),
+
 
     /**
      * 3000 : Response 오류
