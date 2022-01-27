@@ -3,8 +3,6 @@ package com.umc.miner.src.play;
 import com.umc.miner.config.BaseException;
 import com.umc.miner.config.BaseResponse;
 
-import com.umc.miner.src.play.model.PostLoadPlayReq;
-import com.umc.miner.src.play.model.PostLoadPlayRes;
 import com.umc.miner.src.user.UserProvider;
 
 import com.umc.miner.src.play.model.*;
@@ -32,6 +30,58 @@ public class PlayController {
         this.playService = playService;
         this.userProvider = userProvider;
     }
+
+    /**
+     * 맵 공유하기 API
+     * [POST] /playmaps/share
+     */
+    @ResponseBody
+    @PostMapping("/share")
+    public BaseResponse<PostMapRes> postMap(@RequestBody PostMapReq postMapReq) {
+        try {
+            PostMapRes postMapRes = playService.postMap(postMapReq);
+            return new BaseResponse<>(postMapRes);
+        } catch (BaseException exception) {
+            return new BaseResponse<>((exception.getStatus()));
+        }
+    }
+
+    /**
+     * 공유된 맵 수정 API
+     * [PATCH] /playmaps/modify
+     */
+    @ResponseBody
+    @PatchMapping("/modify")
+    public BaseResponse<String> modifyMap(@RequestBody PatchMapReq patchMapReq) {
+        try {
+            patchMapReq.setEditorIdx(userProvider.getEditorIdx(patchMapReq.getNickName())); //patchStatusReq 속 editorIdx에 값 set함
+            playService.modifyMap(patchMapReq);
+
+            String result = "공유 수정이 완료되었습니다.";
+            return new BaseResponse<>(result);
+        } catch (BaseException exception) {
+            return new BaseResponse<>((exception.getStatus()));
+        }
+    }
+
+    /**
+     * 맵 공유 중지 API
+     * [PATCH] /playmaps/stop
+     */
+    @ResponseBody
+    @PatchMapping("/stop")
+    public BaseResponse<String> stopShareMap(@RequestBody PatchMapReq patchMapReq) {
+        try {
+            patchMapReq.setEditorIdx(userProvider.getEditorIdx(patchMapReq.getNickName())); //patchStatusReq 속 editorIdx에 값 set함
+            playService.stopShareMap(patchMapReq);
+
+            String result = "공유 삭제가 완료되었습니다.";
+            return new BaseResponse<>(result);
+        } catch (BaseException exception) {
+            return new BaseResponse<>((exception.getStatus()));
+        }
+    }
+
 
     /**
      * 공유된 맵을 페이징 처리해서 보여주는 API

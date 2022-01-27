@@ -89,7 +89,11 @@ public enum BaseResponseStatus {
     MODIFY_FAIL_PW(false,4015,"비밀번호 수정 실패"),
 
     PASSWORD_ENCRYPTION_ERROR(false, 4011, "비밀번호 암호화에 실패하였습니다."),
-    PASSWORD_DECRYPTION_ERROR(false, 4012, "비밀번호 복호화에 실패하였습니다.");
+    PASSWORD_DECRYPTION_ERROR(false, 4012, "비밀번호 복호화에 실패하였습니다."),
+
+    // [PATCH] /playmaps
+    FAILED_TO_MODIFY_SHARED_MAP(false, 4020, "공유 수정에 실패하였습니다."),
+    FAILED_TO_DELETE_SHARED_MAP(false, 4021, "공유 삭제에 실패하였습니다.");
 
 
     // 5000 : 필요시 만들어서 쓰세요
