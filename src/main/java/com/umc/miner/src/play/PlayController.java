@@ -14,6 +14,8 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
+import static com.umc.miner.config.BaseResponseStatus.FAILED_TO_SHARE_MAP;
+
 @RestController
 @RequestMapping("/miner/playmaps")
 public class PlayController {
@@ -39,8 +41,17 @@ public class PlayController {
     @PostMapping("/share")
     public BaseResponse<PostMapRes> postMap(@RequestBody PostMapReq postMapReq) {
         try {
-            PostMapRes postMapRes = playService.postMap(postMapReq);
-            return new BaseResponse<>(postMapRes);
+            postMapReq.setEditorIdx(userProvider.getEditorIdx(postMapReq.getNickName()));
+
+            if (playProvider.countMap(postMapReq) > 2) {
+                return new BaseResponse<>(FAILED_TO_SHARE_MAP);
+            }
+
+            else {
+                PostMapRes postMapRes = playService.postMap(postMapReq);
+                return new BaseResponse<>(postMapRes);
+            }
+
         } catch (BaseException exception) {
             return new BaseResponse<>((exception.getStatus()));
         }
@@ -54,7 +65,7 @@ public class PlayController {
     @PatchMapping("/modify")
     public BaseResponse<String> modifyMap(@RequestBody PatchMapReq patchMapReq) {
         try {
-            patchMapReq.setEditorIdx(userProvider.getEditorIdx(patchMapReq.getNickName())); //patchStatusReq 속 editorIdx에 값 set함
+            patchMapReq.setEditorIdx(userProvider.getEditorIdx(patchMapReq.getNickName())); //patchMapReq 속 editorIdx에 값 set함
             playService.modifyMap(patchMapReq);
 
             String result = "공유 수정이 완료되었습니다.";
