@@ -22,6 +22,7 @@ public class PlayProvider {
         this.playDao = playDao;
     }
 
+
     // 공유된 맵이 총 몇 개인지 알려준다.
     public int getTotalNumOfPlayMap(GetPagingReq getPagingReq) throws BaseException {
         try {
