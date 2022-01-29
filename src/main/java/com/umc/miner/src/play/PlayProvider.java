@@ -23,6 +23,15 @@ public class PlayProvider {
     }
 
 
+    // User의 공유한 맵 개수
+    public int countMap(PostMapReq postMapReq) throws BaseException {
+        try {
+            return playDao.countMap(postMapReq);
+        } catch (Exception exception) {
+            throw new BaseException(DATABASE_ERROR);
+        }
+    }
+
     // 공유된 맵이 총 몇 개인지 알려준다.
     public int getTotalNumOfPlayMap(GetPagingReq getPagingReq) throws BaseException {
         try {

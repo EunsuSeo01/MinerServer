@@ -15,4 +15,6 @@ public class PostMapReq {
     private int editorIdx;
     private int playCount;
     private String status;
+
+    private String nickName;
 }

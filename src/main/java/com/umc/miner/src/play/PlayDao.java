@@ -1,6 +1,7 @@
 package com.umc.miner.src.play;
 
 import com.umc.miner.src.play.model.*;
+
 import com.umc.miner.src.user.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.jdbc.core.JdbcTemplate;
@@ -33,6 +34,14 @@ public class PlayDao {
 
         String lastInsertIdQuery = "select last_insert_id()";
         return this.jdbcTemplate.queryForObject(lastInsertIdQuery, int.class);
+    }
+
+    // 각 유저가 공유했던 맵 개수 세기
+    public int countMap(PostMapReq postMapReq) {
+        String countMapQuery = "select count(case when editorIdx = ? then 1 end) from PlayMap"; // User Table에 해당 email 값을 갖는 유저 정보가 존재하는가?
+        int countMapParams = postMapReq.getEditorIdx(); //
+        return this.jdbcTemplate.queryForObject(countMapQuery, int.class, countMapParams);
+
     }
 
     // 공유 수정 (mapInfo 변경) - body에 mapInfo, nickName, mapName 입력
