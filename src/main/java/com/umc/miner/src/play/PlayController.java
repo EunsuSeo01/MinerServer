@@ -43,6 +43,7 @@ public class PlayController {
         try {
             postMapReq.setEditorIdx(userProvider.getEditorIdx(postMapReq.getNickName()));
 
+            // DB에 active 상태인 맵이 {3개인 경우 = 2개 넘어가는 경우} 부터 불가능
             if (playProvider.countMap(postMapReq) > 2) {
                 return new BaseResponse<>(FAILED_TO_SHARE_MAP);
             }
