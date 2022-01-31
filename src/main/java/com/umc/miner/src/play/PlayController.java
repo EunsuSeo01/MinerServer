@@ -42,8 +42,9 @@ public class PlayController {
     public BaseResponse<PostMapRes> postMap(@RequestBody PostMapReq postMapReq) {
         try {
             postMapReq.setEditorIdx(userProvider.getEditorIdx(postMapReq.getNickName()));
+            postMapReq.setEditorName(postMapReq.getNickName());
 
-            // DB에 active 상태인 맵이 {3개인 경우 = 2개 넘어가는 경우} 부터 불가능
+            // DB에 active 상태인 맵이 {3개인 경우 = 2개 넘어가는 경우} 부터 공유 불가능
             if (playProvider.countMap(postMapReq) > 2) {
                 return new BaseResponse<>(FAILED_TO_SHARE_MAP);
             }
@@ -82,10 +83,11 @@ public class PlayController {
      */
     @ResponseBody
     @PatchMapping("/stop")
-    public BaseResponse<String> stopShareMap(@RequestBody PatchMapReq patchMapReq) {
+    public BaseResponse<String> stopShareMap(@RequestBody DelMapReq delMapReq) {
         try {
-            patchMapReq.setEditorIdx(userProvider.getEditorIdx(patchMapReq.getNickName())); //patchStatusReq 속 editorIdx에 값 set함
-            playService.stopShareMap(patchMapReq);
+            delMapReq.setEditorIdx(userProvider.getEditorIdx(delMapReq.getNickName())); //delMapReq 속 editorIdx에 값 set함
+
+            playService.stopShareMap(delMapReq);
 
             String result = "공유 삭제가 완료되었습니다.";
             return new BaseResponse<>(result);

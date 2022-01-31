@@ -94,7 +94,8 @@ public enum BaseResponseStatus {
     // [PATCH] /playmaps
     FAILED_TO_SHARE_MAP(false, 4020, "맵 공유는 최대 3개까지 가능합니다."),
     FAILED_TO_MODIFY_SHARED_MAP(false, 4021, "공유 수정에 실패하였습니다."),
-    FAILED_TO_DELETE_SHARED_MAP(false, 4022, "공유 삭제에 실패하였습니다.");
+    FAILED_TO_DELETE_SHARED_MAP(false, 4022, "공유 삭제에 실패하였습니다."),
+    FAILED_TO_DELETE_PLAY_TIME(false, 4023, "플레이 정보 삭제에 실패하였습니다.");
 
 
     // 5000 : 필요시 만들어서 쓰세요

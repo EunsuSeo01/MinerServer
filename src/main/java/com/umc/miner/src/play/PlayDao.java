@@ -5,6 +5,7 @@ import com.umc.miner.src.play.model.*;
 import com.umc.miner.src.user.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.jdbc.core.JdbcTemplate;
+import org.springframework.security.core.parameters.P;
 import org.springframework.stereotype.Repository;
 
 import javax.sql.DataSource;
@@ -28,8 +29,8 @@ public class PlayDao {
 
     // 설계 -> 플레이 공유
     public int postMap(PostMapReq postMapReq) {
-        String postMapQuery = "insert into PlayMap (mapName, mapInfo, mapSize, mapPassword, editorIdx, playCount) VALUES (?,?,?,?,?,?)";
-        Object[] postMapParams = new Object[]{postMapReq.getMapName(), postMapReq.getMapInfo(), postMapReq.getMapSize(), postMapReq.getMapPassword(), postMapReq.getEditorIdx(), postMapReq.getPlayCount()};
+        String postMapQuery = "insert into PlayMap (mapName, mapInfo, mapSize, mapPassword, editorIdx, editorName, playCount) VALUES (?,?,?,?,?,?,?)";
+        Object[] postMapParams = new Object[]{postMapReq.getMapName(), postMapReq.getMapInfo(), postMapReq.getMapSize(), postMapReq.getMapPassword(), postMapReq.getEditorIdx(), postMapReq.getEditorName(), postMapReq.getPlayCount()};
         this.jdbcTemplate.update(postMapQuery, postMapParams);
 
         String lastInsertIdQuery = "select last_insert_id()";
@@ -52,13 +53,33 @@ public class PlayDao {
         return this.jdbcTemplate.update(modifyMapQuery, modifyMapParams);
     }
 
-    // 공유 중지 (status 변경)
-    public int stopShareMap(PatchMapReq patchMapReq) {
-        String stopShareMapQuery = "update PlayMap set status='inactive' where (editorIdx = ?) and (mapName = ?)";
-        Object[] stopShareMapParams = new Object[]{patchMapReq.getEditorIdx(), patchMapReq.getMapName()};
+    // 공유 중지 (DB에서 맵 삭제)
+    public int stopShareMap(DelMapReq delMapReq) {
+        String stopShareMapQuery = "delete from PlayMap where (editorIdx = ?) and (mapName = ?)";
+        Object[] stopShareMapParams = new Object[]{delMapReq.getEditorIdx(), delMapReq.getMapName()};
 
+//        int str = this.jdbcTemplate.queryForObject(stopShareMapQuery, int.class, stopShareMapParams);
+
+//        System.out.println(str);
+//        return 1;
         return this.jdbcTemplate.update(stopShareMapQuery, stopShareMapParams);
     }
+
+    // mapIdx 찾기
+    public int getMapIdx(DelMapReq delMapReq) {
+        String getMapIdxQuery = "select mapIdx from PlayMap where (editorIdx = ?) and (mapName = ?)";
+        Object[] getMapIdxParams = new Object[]{delMapReq.getEditorIdx(), delMapReq.getMapName()};
+
+        return this.jdbcTemplate.queryForObject(getMapIdxQuery, int.class, getMapIdxParams);
+    }
+
+    // 공유 중지한 맵 플레이정보 삭제
+    public int delPlayTime(int mapIdx) {
+        String delPlayTimeQuery = "delete from PlayTime where mapIdx = ?";
+        return this.jdbcTemplate.update(delPlayTimeQuery, mapIdx);
+    }
+
+
 
     // 공유된 맵이 총 몇 개인지 알려준다.
     public int getTotalNumOfPlayMap() {

@@ -13,6 +13,7 @@ public class PostMapReq {
     private int mapSize;
     private int mapPassword;
     private int editorIdx;
+    private String editorName;
     private int playCount;
     private String status;
 
