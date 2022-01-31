@@ -9,12 +9,17 @@ import com.umc.miner.src.user.UserProvider;
 
 import com.umc.miner.src.play.model.*;
 import com.umc.miner.utils.Pagination;
+
 import org.jetbrains.annotations.NotNull;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
+
+
+import java.sql.Time;
+import java.util.List;
 
 @RestController
 @RequestMapping("/miner/playmaps")
@@ -55,41 +60,72 @@ public class PlayController {
     }
 
     /**
-     * @param postLoadPlayReq
-     * @return
+     * 미로맵 클릭 시 mapPassword, mapSize, user, playTime을 알려준다.
+     * [POST] /miner/playmaps/loadPlayInfo
      */
     @ResponseBody
     @PostMapping("/loadPlayInfo")
-    public BaseResponse<String> loadPlayInfo(@RequestBody PostLoadPlayReq postLoadPlayReq) {
+    public BaseResponse<PostLoadPlayRes> loadPlayInfo(@RequestBody PostLoadPlayReq postLoadPlayReq) {
         PostLoadPlayRes postLoadPlayRes = new PostLoadPlayRes();
 
         try {
-//            int gegegege = playProvider.loadPlayInfo(postLoadPlayReq);
-//            System.out.println(gegegege + "어떻게 나오나용");
-
-            // 빈칸일 시 -> 그럴일은 없을 듯 하긴 함
-            if (postLoadPlayReq.getMapName() == null || postLoadPlayReq.getEditorName() == null) {
-
-            }
             // userIdx set
             postLoadPlayReq.setEditorIdx(userProvider.getEditorIdx(postLoadPlayReq.getEditorName()));
-
-            // mapIdx가 없을 때
-            if (playProvider.getMapIdx(postLoadPlayReq) == 0) {
-
-            }
             // mapIdx set
-            postLoadPlayReq.setMapIdx(playProvider.getMapIdx(postLoadPlayReq));
+            postLoadPlayReq.setMapIdx(playProvider.getMapIdx(postLoadPlayReq.getEditorIdx(), postLoadPlayReq.getMapName()));
 
+            // PlayMap
+            PlayMapInfo playMapInfo = playProvider.loadPlayMapInfo(postLoadPlayReq);
+            postLoadPlayRes.setMapPassword(playMapInfo.getMapPassword());
+            postLoadPlayRes.setMapSize(playMapInfo.getMapSize());
 
-            // playTimeIdx로 playMap을 찾을 수 없는 거
-//            if (playProvider.loadPlayInfo(postLoadPlayReq) == 0) {
-//
-//            }
+            //PlayTime
+            List<PlayTimeInfo> playTimeInfoList = playProvider.loadPlayTimeInfo(postLoadPlayReq);
+            postLoadPlayRes.setPlayInfoList(playTimeInfoList);
 
-            String result = "쿠쿠루 삥뽕빵";
-            return new BaseResponse<>(result);
+            //PlayTime average
+            int totalSec = 0;
+            int userCount = 0;
+            for (int i = 0; i < playTimeInfoList.size(); i++) {
+                String stringTemp = playTimeInfoList.get(i).getPlayTime().toString();
 
+                String[] hourMin = stringTemp.split(":");
+                int hour = Integer.parseInt(hourMin[0]);
+                int mins = Integer.parseInt(hourMin[1]);
+                int sec = Integer.parseInt(hourMin[2]);
+                totalSec += (hour * 360) + (mins * 60) + sec;
+                userCount++;
+            }
+            postLoadPlayRes.setAvgPlayTime(totalSec / userCount);
+            return new BaseResponse<>(postLoadPlayRes);
+
+        } catch (BaseException exception) {
+            return new BaseResponse<>((exception.getStatus()));
+        }
+    }
+
+    /**
+     * 플레이 정보 저장
+     * [PATCH] /miner/playmaps/savePlayInfo
+     */
+    @ResponseBody
+    @PatchMapping("/savePlayInfo")
+    public BaseResponse<PatchSavePlayRes> savePlayInfo(@RequestBody PatchSavePlayReq patchSavePlayReq) {
+        PatchSavePlayRes patchSavePlayRes = new PatchSavePlayRes();
+        try {
+            // editorIdx set
+            patchSavePlayReq.setEditorIdx(userProvider.getEditorIdx(patchSavePlayReq.getEditorName()));
+            // playerIdx set
+            patchSavePlayReq.setPlayerIdx(userProvider.getEditorIdx(patchSavePlayReq.getPlayerName()));
+            // mapIdx set
+            patchSavePlayReq.setMapIdx(playProvider.getMapIdx(patchSavePlayReq.getEditorIdx(), patchSavePlayReq.getMapName()));
+
+            if (playProvider.checkPlayerInfo(patchSavePlayReq) == 0) {
+                patchSavePlayRes.setPlayerName(playProvider.savePlayInfo(patchSavePlayReq));
+            } else {
+                patchSavePlayRes.setPlayerName(playProvider.updatePlayerInfo(patchSavePlayReq));
+            }
+            return new BaseResponse<>(patchSavePlayRes);
         } catch (BaseException exception) {
             return new BaseResponse<>((exception.getStatus()));
         }

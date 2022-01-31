@@ -21,7 +21,6 @@ public class PlayProvider {
 
     final Logger logger = LoggerFactory.getLogger(this.getClass());
 
-
     private final PlayDao playDao;
 
     @Autowired
@@ -29,13 +28,48 @@ public class PlayProvider {
         this.playDao = playDao;
     }
 
-    // DB에서 Play Time 정보 가져오기이이
-    // try -catch를 통해서 filtering 처리 가능한듯
-    public int loadPlayInfo(PostLoadPlayReq postLoadPlayReq) throws BaseException {
-        int temp = playDao.loadPlayInfo(postLoadPlayReq);
+    // PlayMap 정보 가져오기 (pw, size)
+    public PlayMapInfo loadPlayMapInfo(PostLoadPlayReq postLoadPlayReq) throws BaseException {
         try {
-            // if temp가 어쩌구저쩌구 ㄱㄱ
-            return temp;
+            return playDao.loadPlayMapInfo(postLoadPlayReq);
+        } catch (Exception exception) {
+            throw new BaseException(DATABASE_ERROR);
+        }
+    }
+
+    // mapIdx로 playTime가져오기
+    public List<PlayTimeInfo> loadPlayTimeInfo(PostLoadPlayReq postLoadPlayReq) throws BaseException {
+        try {
+            return playDao.loadPlayTimeInfo(postLoadPlayReq);
+        } catch (Exception exception) {
+            throw new BaseException(DATABASE_ERROR);
+        }
+    }
+
+    // save 전 Player정보가 있는지  확인
+    public int checkPlayerInfo(PatchSavePlayReq patchSavePlayReq) throws BaseException {
+        try {
+            return playDao.checkPlayerInfo(patchSavePlayReq);
+        } catch (Exception exception) {
+            throw new BaseException(DATABASE_ERROR);
+        }
+    }
+
+    // playInfo 저장
+    public String savePlayInfo(PatchSavePlayReq patchSavePlayReq) throws BaseException {
+        try {
+            playDao.savePlayInfo(patchSavePlayReq);
+            return patchSavePlayReq.getPlayerName();
+        } catch (Exception exception) {
+            throw new BaseException(DATABASE_ERROR);
+        }
+    }
+
+    // playInfo update
+    public String updatePlayerInfo(PatchSavePlayReq patchSavePlayReq) throws BaseException {
+        try {
+            playDao.updatePlayerInfo(patchSavePlayReq);
+            return patchSavePlayReq.getPlayerName();
         } catch (Exception exception) {
             throw new BaseException(DATABASE_ERROR);
         }
@@ -51,9 +85,9 @@ public class PlayProvider {
     }
 
 
-    public int getMapIdx(PostLoadPlayReq postLoadPlayReq) throws BaseException {
+    public int getMapIdx(int editorIdx, String mapName) throws BaseException {
         try {
-            return playDao.getMapIdx(postLoadPlayReq);
+            return playDao.getMapIdx(editorIdx, mapName);
         } catch (Exception exception) {
             throw new BaseException(DATABASE_ERROR);
         }

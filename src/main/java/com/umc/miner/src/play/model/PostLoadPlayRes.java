@@ -4,6 +4,8 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
+import java.util.List;
+
 @Getter
 @Setter
 @NoArgsConstructor
@@ -11,8 +13,11 @@ public class PostLoadPlayRes {
     private int mapPassword;
     private int mapSize;
 
-    private int userIdx;
-    private int playTime;
-
     private int avgPlayTime;
+
+    private List<PlayTimeInfo> playInfoList;
+
+    public PostLoadPlayRes(List<PlayTimeInfo> playInfoList){
+        this.playInfoList = playInfoList;
+    }
 }

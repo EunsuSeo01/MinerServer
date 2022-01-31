@@ -22,14 +22,68 @@ public class PlayDao {
     }
 
 
-    public int loadPlayInfo(PostLoadPlayReq postLoadPlayReq) {
-        String loadPlayMapQuery = "select mapPassword, mapSize from playMap where mapIdx = ? "; // User Table에 해당 email 값을 갖는 유저 정보가 존재하는가?
-        return this.jdbcTemplate.queryForObject(loadPlayMapQuery, int.class, postLoadPlayReq.getMapIdx()); // checkEmailQuery, checkEmailParams를 통해 가져온 값(intgud)을 반환한다. -> 쿼리문의 결과(존재하지 않음(False,0),존재함(True, 1))를 int형(0,1)으로 반환됩니다.
+    // userIdx, mapName으로 mapIdx가져오기
+    public int getMapIdx(int editorIdx, String mapName) {
+        String getNickIdxQuery = "select mapIdx from PlayMap where editorIdx = ? AND mapName = ?";
+        return this.jdbcTemplate.queryForObject(getNickIdxQuery, int.class, editorIdx, mapName);
     }
 
-    public int getMapIdx(PostLoadPlayReq postLoadPlayReq) {
-        String getNickIdxQuery = "select mapIdx from PlayMap where editroIdx = ? AND mapName = ?";
-        return this.jdbcTemplate.queryForObject(getNickIdxQuery, int.class, postLoadPlayReq.getEditorIdx(), postLoadPlayReq.getMapName());
+    // 맵 정보 불러오기
+    public PlayMapInfo loadPlayMapInfo(PostLoadPlayReq postLoadPlayReq) {
+        String loadPlayMapQuery = "select mapPassword, mapSize from PlayMap where mapIdx = ? ";
+
+        return this.jdbcTemplate.queryForObject(loadPlayMapQuery,
+                (rs, rowNum) -> new PlayMapInfo(
+                        rs.getInt("mapPassword"),
+                        rs.getInt("mapSize")
+                ), // RowMapper(위의 링크 참조): 원하는 결과값 형태로 받기
+                postLoadPlayReq.getMapIdx()
+        );
+    }
+
+    // PlayTimeInfo 불러오기
+    public List<PlayTimeInfo> loadPlayTimeInfo(PostLoadPlayReq postLoadPlayReq) {
+        String loadPlayTimeQuery = "select userIdx, playTime from PlayTime where mapIdx = ? ";
+
+        return this.jdbcTemplate.query(loadPlayTimeQuery,
+                (rs, rowNum) -> new PlayTimeInfo(
+                        rs.getInt("userIdx"),
+                        rs.getTime("playTime")
+                ), // RowMapper(위의 링크 참조): 원하는 결과값 형태로 받기
+                postLoadPlayReq.getMapIdx()
+        );
+    }
+
+    // playInfo 저장하기
+    public int savePlayInfo(PatchSavePlayReq patchSavePlayReq) {
+        System.out.println(patchSavePlayReq.getPlayerIdx() + " 플레이어 ");
+        System.out.println(patchSavePlayReq.getMapIdx() + " 맵네임");
+        System.out.println(patchSavePlayReq.getPlayTime() + " 왜애애애애애애애애ㅐ");
+
+        String savePlayQuery = "insert into PlayTime (userIdx, mapIdx, playTime) VALUES (?,?,?)";
+        Object[] savePlayParams = new Object[]{patchSavePlayReq.getPlayerIdx(), patchSavePlayReq.getMapIdx(), patchSavePlayReq.getPlayTime()};
+        this.jdbcTemplate.update(savePlayQuery, savePlayParams);
+
+        String lastInsertIdQuery = "select last_insert_id()";
+        return this.jdbcTemplate.queryForObject(lastInsertIdQuery, int.class);
+    }
+
+    // player 정보가 존재하는지 확인
+    public int checkPlayerInfo(PatchSavePlayReq patchSavePlayReq) {
+        String checkPlayQuery = "select exists(select userIdx, mapIdx from PlayTime where userIdx = ? AND mapIdx = ?)";
+        Object[] checkPlayParams = new Object[]{patchSavePlayReq.getPlayerIdx(), patchSavePlayReq.getMapIdx()};
+        return this.jdbcTemplate.queryForObject(checkPlayQuery, int.class, checkPlayParams);
+    }
+
+    // player 정보 update
+    public int updatePlayerInfo(PatchSavePlayReq patchSavePlayReq) {
+        System.out.println(patchSavePlayReq.getPlayerIdx() + " 플레이어 ");
+        System.out.println(patchSavePlayReq.getMapIdx() + " 맵네임");
+        System.out.println(patchSavePlayReq.getPlayTime() + " 왜애애애애애애애애ㅐ");
+
+        String updatePlayQuery = "update PlayTime set playTime = ? where (userIdx = ?) AND (mapIdx = ?)";
+        Object[] updatePlayParams = new Object[]{patchSavePlayReq.getPlayTime(), patchSavePlayReq.getPlayerIdx(), patchSavePlayReq.getMapIdx()};
+        return this.jdbcTemplate.update(updatePlayQuery, updatePlayParams);
     }
 
     // 공유된 맵이 총 몇 개인지 알려준다.
