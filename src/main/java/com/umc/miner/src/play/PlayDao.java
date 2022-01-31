@@ -13,18 +13,61 @@ import java.util.List;
 @Repository
 public class PlayDao {
     private JdbcTemplate jdbcTemplate;
+    private final UserDao userDao;
 
     @Autowired
     public void setDataSource(DataSource dataSource) {
         this.jdbcTemplate = new JdbcTemplate(dataSource);
     }
 
-    private final UserDao userDao;
-
     @Autowired
     public PlayDao(UserDao userDao) {
         this.userDao = userDao;
     }
+
+
+    // userIdx, mapName으로 mapIdx가져오기
+    public int getMapIdx(int editorIdx, String mapName) {
+        String getNickIdxQuery = "select mapIdx from PlayMap where editorIdx = ? AND mapName = ?";
+        return this.jdbcTemplate.queryForObject(getNickIdxQuery, int.class, editorIdx, mapName);
+    }
+
+    // 맵 정보 불러오기
+    public PlayMapInfo loadPlayMapInfo(PostLoadPlayReq postLoadPlayReq) {
+        String loadPlayMapQuery = "select mapPassword, mapSize from PlayMap where mapIdx = ? ";
+
+        return this.jdbcTemplate.queryForObject(loadPlayMapQuery,
+                (rs, rowNum) -> new PlayMapInfo(
+                        rs.getInt("mapPassword"),
+                        rs.getInt("mapSize")
+                ), // RowMapper(위의 링크 참조): 원하는 결과값 형태로 받기
+                postLoadPlayReq.getMapIdx()
+        );
+    }
+
+    // PlayTimeInfo 불러오기
+    public List<PlayTimeInfo> loadPlayTimeInfo(PostLoadPlayReq postLoadPlayReq) {
+        String loadPlayTimeQuery = "select userIdx, playTime from PlayTime where mapIdx = ? ";
+
+        return this.jdbcTemplate.query(loadPlayTimeQuery,
+                (rs, rowNum) -> new PlayTimeInfo(
+                        rs.getInt("userIdx"),
+                        rs.getTime("playTime")
+                ), // RowMapper(위의 링크 참조): 원하는 결과값 형태로 받기
+                postLoadPlayReq.getMapIdx()
+        );
+    }
+
+    // playInfo 저장하기
+    public int savePlayInfo(PatchSavePlayReq patchSavePlayReq) {
+        String savePlayQuery = "insert into PlayTime (userIdx, mapIdx, playTime) VALUES (?,?,?)";
+        Object[] savePlayParams = new Object[]{patchSavePlayReq.getPlayerIdx(), patchSavePlayReq.getMapIdx(), patchSavePlayReq.getPlayTime()};
+        this.jdbcTemplate.update(savePlayQuery, savePlayParams);
+
+        String lastInsertIdQuery = "select last_insert_id()";
+        return this.jdbcTemplate.queryForObject(lastInsertIdQuery, int.class);
+    }
+
 
     // 설계 -> 플레이 공유
     public int postMap(PostMapReq postMapReq) {
@@ -34,6 +77,21 @@ public class PlayDao {
 
         String lastInsertIdQuery = "select last_insert_id()";
         return this.jdbcTemplate.queryForObject(lastInsertIdQuery, int.class);
+    }
+
+
+    // player 정보가 존재하는지 확인
+    public int checkPlayerInfo(PatchSavePlayReq patchSavePlayReq) {
+        String checkPlayQuery = "select exists(select userIdx, mapIdx from PlayTime where userIdx = ? AND mapIdx = ?)";
+        Object[] checkPlayParams = new Object[]{patchSavePlayReq.getPlayerIdx(), patchSavePlayReq.getMapIdx()};
+        return this.jdbcTemplate.queryForObject(checkPlayQuery, int.class, checkPlayParams);
+    }
+
+    // player 정보 update
+    public int updatePlayerInfo(PatchSavePlayReq patchSavePlayReq) {
+        String updatePlayQuery = "update PlayTime set playTime = ? where (userIdx = ?) AND (mapIdx = ?)";
+        Object[] updatePlayParams = new Object[]{patchSavePlayReq.getPlayTime(), patchSavePlayReq.getPlayerIdx(), patchSavePlayReq.getMapIdx()};
+        return this.jdbcTemplate.update(updatePlayQuery, updatePlayParams);
     }
 
     // 각 유저가 공유했던 맵 개수 세기
@@ -63,7 +121,7 @@ public class PlayDao {
     // 공유된 맵이 총 몇 개인지 알려준다.
     public int getTotalNumOfPlayMap() {
         String getTotalNumQuery = "select count(mapIdx) from PlayMap where status = ?";
-        return this.jdbcTemplate.queryForObject(getTotalNumQuery, int.class,"active");
+        return this.jdbcTemplate.queryForObject(getTotalNumQuery, int.class, "active");
     }
 
     // 검색 조건에 맞는 맵이 총 몇 개인지 알려준다.
@@ -72,12 +130,12 @@ public class PlayDao {
         // 미로명 검색.
         if (getPagingReq.getSearchType() == 1) {
             getSearchedNumQuery = "select count(mapIdx) from PlayMap where status = ? and mapName = ?";
-            return this.jdbcTemplate.queryForObject(getSearchedNumQuery, int.class,"active", getPagingReq.getSearchContent());
+            return this.jdbcTemplate.queryForObject(getSearchedNumQuery, int.class, "active", getPagingReq.getSearchContent());
         }
         // 닉네임명 검색.
         else {
             getSearchedNumQuery = "select count(mapIdx) from PlayMap where status = ? and editorIdx = ?";
-            return this.jdbcTemplate.queryForObject(getSearchedNumQuery, int.class,"active", userDao.getEditorIdx(getPagingReq.getSearchContent()));
+            return this.jdbcTemplate.queryForObject(getSearchedNumQuery, int.class, "active", userDao.getEditorIdx(getPagingReq.getSearchContent()));
         }
 
     }

@@ -56,7 +56,7 @@ public class UserDao {
 
     // 비밀번호 변경
     public int modifyPw(PatchChangePwReq patchChangePwReq) {
-        String modifyPwQuery = "update User set password = ? where userIdx = ? "; // 해당 userIdx를 만족하는 User를 해당 nickname으로 변경한다.
+        String modifyPwQuery = "update User set password = ? where userIdx = ? ";
         Object[] modifyPwParams = new Object[]{patchChangePwReq.getPassword(), patchChangePwReq.getUserIdx()};
 
         return this.jdbcTemplate.update(modifyPwQuery, modifyPwParams); // 대응시켜 매핑시켜 쿼리 요청(생성했으면 1, 실패했으면 0)

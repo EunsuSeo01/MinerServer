@@ -22,6 +22,52 @@ public class PlayProvider {
         this.playDao = playDao;
     }
 
+    // PlayMap 정보 가져오기 (pw, size)
+    public PlayMapInfo loadPlayMapInfo(PostLoadPlayReq postLoadPlayReq) throws BaseException {
+        try {
+            return playDao.loadPlayMapInfo(postLoadPlayReq);
+        } catch (Exception exception) {
+            throw new BaseException(DATABASE_ERROR);
+        }
+    }
+
+    // mapIdx로 playTime가져오기
+    public List<PlayTimeInfo> loadPlayTimeInfo(PostLoadPlayReq postLoadPlayReq) throws BaseException {
+        try {
+            return playDao.loadPlayTimeInfo(postLoadPlayReq);
+        } catch (Exception exception) {
+            throw new BaseException(DATABASE_ERROR);
+        }
+    }
+
+    // save 전 Player정보가 있는지  확인
+    public int checkPlayerInfo(PatchSavePlayReq patchSavePlayReq) throws BaseException {
+        try {
+            return playDao.checkPlayerInfo(patchSavePlayReq);
+        } catch (Exception exception) {
+            throw new BaseException(DATABASE_ERROR);
+        }
+    }
+
+    // playInfo 저장
+    public String savePlayInfo(PatchSavePlayReq patchSavePlayReq) throws BaseException {
+        try {
+            playDao.savePlayInfo(patchSavePlayReq);
+            return patchSavePlayReq.getPlayerName();
+        } catch (Exception exception) {
+            throw new BaseException(DATABASE_ERROR);
+        }
+    }
+
+    // playInfo update
+    public String updatePlayerInfo(PatchSavePlayReq patchSavePlayReq) throws BaseException {
+        try {
+            playDao.updatePlayerInfo(patchSavePlayReq);
+            return patchSavePlayReq.getPlayerName();
+        } catch (Exception exception) {
+            throw new BaseException(DATABASE_ERROR);
+        }
+    }
 
     // User의 공유한 맵 개수
     public int countMap(PostMapReq postMapReq) throws BaseException {
@@ -37,11 +83,19 @@ public class PlayProvider {
         try {
             if (getPagingReq.getSearchContent() != null) {
                 return playDao.getSearchedNumOfPlayMap(getPagingReq);
-            }
-            else {
+            } else {
                 return playDao.getTotalNumOfPlayMap();
             }
-        } catch(Exception exception) {
+        } catch (Exception exception) {
+            throw new BaseException(DATABASE_ERROR);
+        }
+    }
+
+
+    public int getMapIdx(int editorIdx, String mapName) throws BaseException {
+        try {
+            return playDao.getMapIdx(editorIdx, mapName);
+        } catch (Exception exception) {
             throw new BaseException(DATABASE_ERROR);
         }
     }
@@ -52,11 +106,10 @@ public class PlayProvider {
             if (getPagingReq.getSearchContent() != null) {
                 return playDao.getSearchPlayMap(getPagingReq, mapNumPerPage);
             }
-
             return playDao.getPlayMap(getPagingReq, mapNumPerPage);
-        } catch(Exception exception) {
+        } catch (Exception exception) {
             throw new BaseException(DATABASE_ERROR);
         }
     }
-    
+
 }
