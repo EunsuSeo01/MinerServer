@@ -92,22 +92,15 @@ public class UserDao {
         return this.jdbcTemplate.queryForObject(getUserIdxQuery, int.class, phoneNum);
     }
 
-
-    // 이메일 알려준다.
-//    public String getUserEmail(int userIdx) {
-//        String getEmailQuery = "select email from User where userIdx = ?";
-//        return this.jdbcTemplate.queryForObject(getEmailQuery, String.class, userIdx);
-//    }
+    // 해당 핸드폰 번호를 가진 유저의 이메일을 알려준다.
+    public String getUserEmail(String permittedPhoneNum) {
+        String getEmailQuery = "select email from User where phoneNum = ?";
+        return this.jdbcTemplate.queryForObject(getEmailQuery, String.class, permittedPhoneNum);
+    }
 
     // nickName의 userIdx 찾기
     public int getEditorIdx(String nickName) {
         String getNickIdxQuery = "select userIdx from User where nickName = ?";
         return this.jdbcTemplate.queryForObject(getNickIdxQuery, int.class, nickName);
-    }
-
-    // 해당 핸드폰 번호를 가진 유저의 이메일을 알려준다.
-    public String getUserEmail(String permittedPhoneNum) {
-        String getEmailQuery = "select email from User where phoneNum = ?";
-        return this.jdbcTemplate.queryForObject(getEmailQuery, String.class, permittedPhoneNum);
     }
 }

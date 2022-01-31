@@ -3,8 +3,6 @@ package com.umc.miner.src.play;
 import com.umc.miner.config.BaseException;
 import com.umc.miner.config.BaseResponse;
 
-import com.umc.miner.src.play.model.PostLoadPlayReq;
-import com.umc.miner.src.play.model.PostLoadPlayRes;
 import com.umc.miner.src.user.UserProvider;
 
 import com.umc.miner.src.play.model.*;
@@ -18,8 +16,10 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
 
-import java.sql.Time;
 import java.util.List;
+
+import static com.umc.miner.config.BaseResponseStatus.FAILED_TO_SHARE_MAP;
+
 
 @RestController
 @RequestMapping("/miner/playmaps")
@@ -39,6 +39,66 @@ public class PlayController {
     }
 
     /**
+     * 맵 공유하기 API
+     * [POST] /playmaps/share
+     */
+    @ResponseBody
+    @PostMapping("/share")
+    public BaseResponse<PostMapRes> postMap(@RequestBody PostMapReq postMapReq) {
+        try {
+            postMapReq.setEditorIdx(userProvider.getEditorIdx(postMapReq.getNickName()));
+
+            // DB에 active 상태인 맵이 {3개인 경우 = 2개 넘어가는 경우} 부터 불가능
+            if (playProvider.countMap(postMapReq) > 2) {
+                return new BaseResponse<>(FAILED_TO_SHARE_MAP);
+            } else {
+                PostMapRes postMapRes = playService.postMap(postMapReq);
+                return new BaseResponse<>(postMapRes);
+            }
+
+        } catch (BaseException exception) {
+            return new BaseResponse<>((exception.getStatus()));
+        }
+    }
+
+    /**
+     * 공유된 맵 수정 API
+     * [PATCH] /playmaps/modify
+     */
+    @ResponseBody
+    @PatchMapping("/modify")
+    public BaseResponse<String> modifyMap(@RequestBody PatchMapReq patchMapReq) {
+        try {
+            patchMapReq.setEditorIdx(userProvider.getEditorIdx(patchMapReq.getNickName())); //patchMapReq 속 editorIdx에 값 set함
+            playService.modifyMap(patchMapReq);
+
+            String result = "공유 수정이 완료되었습니다.";
+            return new BaseResponse<>(result);
+        } catch (BaseException exception) {
+            return new BaseResponse<>((exception.getStatus()));
+        }
+    }
+
+    /**
+     * 맵 공유 중지 API
+     * [PATCH] /playmaps/stop
+     */
+    @ResponseBody
+    @PatchMapping("/stop")
+    public BaseResponse<String> stopShareMap(@RequestBody PatchMapReq patchMapReq) {
+        try {
+            patchMapReq.setEditorIdx(userProvider.getEditorIdx(patchMapReq.getNickName())); //patchStatusReq 속 editorIdx에 값 set함
+            playService.stopShareMap(patchMapReq);
+
+            String result = "공유 삭제가 완료되었습니다.";
+            return new BaseResponse<>(result);
+        } catch (BaseException exception) {
+            return new BaseResponse<>((exception.getStatus()));
+        }
+    }
+
+
+    /**
      * 공유된 맵을 페이징 처리해서 보여주는 API
      * [POST] /miner/playmaps
      */
@@ -49,7 +109,27 @@ public class PlayController {
             int mapNumPerPage = 4;  // 한 페이지에 4개씩 조회되도록. mapNumPerPage = 한 페이지당 맵의 개수.
 
             Pagination paging = new Pagination(getPagingReq.getPageNo(), mapNumPerPage);
-            paging.pageInfo(playProvider.getTotalNumOfPlayMap());
+            paging.pageInfo(playProvider.getTotalNumOfPlayMap(getPagingReq));
+
+            GetPagingRes result = new GetPagingRes(playProvider.getPlayMap(getPagingReq, mapNumPerPage), paging);
+            return new BaseResponse(result);
+        } catch (BaseException exception) {
+            return new BaseResponse<>((exception.getStatus()));
+        }
+    }
+
+    /**
+     * 검색 결과를 페이징 처리해서 보여주는 API
+     * [POST] /miner/playmaps/search
+     */
+    @ResponseBody
+    @PostMapping("/search")
+    public BaseResponse<GetPagingRes> getSearch(@RequestBody @NotNull GetPagingReq getPagingReq) {
+        try {
+            int mapNumPerPage = 4;  // 한 페이지에 4개씩 조회되도록. mapNumPerPage = 한 페이지당 맵의 개수.
+
+            Pagination paging = new Pagination(getPagingReq.getPageNo(), mapNumPerPage);
+            paging.pageInfo(playProvider.getTotalNumOfPlayMap(getPagingReq));
 
             GetPagingRes result = new GetPagingRes(playProvider.getPlayMap(getPagingReq, mapNumPerPage), paging);
             return new BaseResponse(result);
@@ -83,6 +163,7 @@ public class PlayController {
             List<PlayTimeInfo> playTimeInfoList = playProvider.loadPlayTimeInfo(postLoadPlayReq);
             postLoadPlayRes.setPlayInfoList(playTimeInfoList);
 
+
             //PlayTime average
             int totalSec = 0;
             int userCount = 0;
@@ -103,6 +184,7 @@ public class PlayController {
             return new BaseResponse<>((exception.getStatus()));
         }
     }
+
 
     /**
      * 플레이 정보 저장

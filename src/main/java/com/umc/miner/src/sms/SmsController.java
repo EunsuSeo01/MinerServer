@@ -24,10 +24,12 @@ public class SmsController {
 
     final Logger logger = LoggerFactory.getLogger(this.getClass());
 
-    @Autowired
+    private final SmsProvider smsProvider;
     private final SmsService smsService;
 
-    public SmsController(SmsService smsService) {
+    @Autowired
+    public SmsController(SmsProvider smsProvider, SmsService smsService) {
+        this.smsProvider = smsProvider;
         this.smsService = smsService;
     }
 
@@ -60,6 +62,12 @@ public class SmsController {
             SmsRes data = smsService.sendSms(recipientPhoneNum, request.getContent());
 
             try {
+                // 해당 전화번호의 유저가 이전에 수신받은 인증번호가 있는지 확인.
+                if (smsProvider.checkPrevAuthNum(recipientPhoneNum) == 1) {
+                    // 있으면 이전에 보내진 인증번호니까 지운다.
+                    smsService.deletePrevAuth(recipientPhoneNum);
+                }
+
                 // DB에 전송한 인증번호랑 문자를 받은 유저 인덱스 저장.
                 PostSmsAuthReq postSmsAuthReq = new PostSmsAuthReq(recipientPhoneNum, authNum);
                 smsService.postSmsAuth(postSmsAuthReq);

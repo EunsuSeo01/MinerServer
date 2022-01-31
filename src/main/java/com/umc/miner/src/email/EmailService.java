@@ -35,7 +35,6 @@ public class EmailService {
     public void mailSend(Email email) {
         SimpleMailMessage message = new SimpleMailMessage();
 
-
         String emailTitle = "[Miner] 비밀번호 변경";
         String emailMessage = "인증번호는 " + randomAuthNum + " 입니다";
 
