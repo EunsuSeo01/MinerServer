@@ -78,14 +78,14 @@ public class PlayProvider {
         }
     }
 
-    // mapIdx 찾기
-    public int getMapIdx(DelMapReq delMapReq) throws BaseException {
-        try {
-            return playDao.getMapIdx(delMapReq);
-        } catch (Exception exception) {
-            throw new BaseException(DATABASE_ERROR);
-        }
-    }
+//     mapIdx 찾기
+//    public int getMapIdx(DelMapReq delMapReq) throws BaseException {
+//        try {
+//            return playDao.getMapIdx(delMapReq);
+//        } catch (Exception exception) {
+//            throw new BaseException(DATABASE_ERROR);
+//        }
+//    }
 
 
     // 공유된 맵이 총 몇 개인지 알려준다.

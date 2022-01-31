@@ -116,12 +116,9 @@ public class PlayDao {
         String stopShareMapQuery = "delete from PlayMap where (editorIdx = ?) and (mapName = ?)";
         Object[] stopShareMapParams = new Object[]{delMapReq.getEditorIdx(), delMapReq.getMapName()};
 
-//        int str = this.jdbcTemplate.queryForObject(stopShareMapQuery, int.class, stopShareMapParams);
-
-//        System.out.println(str);
-//        return 1;
         return this.jdbcTemplate.update(stopShareMapQuery, stopShareMapParams);
     }
+
 
     // mapIdx 찾기
     public int getMapIdx(DelMapReq delMapReq) {
@@ -136,8 +133,6 @@ public class PlayDao {
         String delPlayTimeQuery = "delete from PlayTime where mapIdx = ?";
         return this.jdbcTemplate.update(delPlayTimeQuery, mapIdx);
     }
-
-
 
     // 공유된 맵이 총 몇 개인지 알려준다.
     public int getTotalNumOfPlayMap() {
