@@ -11,6 +11,7 @@ public class GetPlayMapRes {
     private String mapInfo;
     private int mapSize;    // 0, 1, 2 = 작음 중간 큼
     private int mapPassword;
+    private String editorName;
     private int playCount;
     private String status;  // active, inactive
     private String createAt;
