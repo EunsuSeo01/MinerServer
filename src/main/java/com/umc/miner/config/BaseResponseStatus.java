@@ -74,6 +74,9 @@ public enum BaseResponseStatus {
     NOT_REGISTERED_PHONE_NUMBER(false, 3015, "해당 전화번호로 가입된 아이디가 없습니다."),
     FAILED_TO_MSG(false, 3016, "메세지 전송에 실패하였습니다."),
 
+    FAILED_PLAYCOUNT(false, 3018, "playCount에 실패하였습니다."),
+
+    FAILED_ACCOUNT(false, 3019, "옳은 정보가 아닙니다."),
 
 
 

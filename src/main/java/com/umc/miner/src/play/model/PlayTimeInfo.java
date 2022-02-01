@@ -10,5 +10,6 @@ import java.sql.Time;
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 public class PlayTimeInfo {
     private int userIdx;
+    private String playerName;
     private Time playTime;
 }
