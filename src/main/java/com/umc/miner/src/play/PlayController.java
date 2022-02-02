@@ -89,10 +89,20 @@ public class PlayController {
     public BaseResponse<String> stopShareMap(@RequestBody DelMapReq delMapReq) {
         try {
             delMapReq.setEditorIdx(userProvider.getEditorIdx(delMapReq.getNickName())); //delMapReq 속 editorIdx에 값 set함
+            int mapIdx = playProvider.getMapIdx(delMapReq);
 
-            playService.stopShareMap(delMapReq);
+            // 공유 중지할 맵의 플레이 정보가 없을 경우 : 맵만 삭제
+            if (playProvider.checkPlayTime(mapIdx) == 0) {
+                playService.stopShareMap(delMapReq);
+            }
 
-            String result = "공유 삭제가 완료되었습니다.";
+            // 공유 중지할 맵의 플레이 정보가 있는 경우 : 플레이 정보 삭제 후 맵 삭제
+            if (playProvider.checkPlayTime(mapIdx) == 1) {
+                playService.delPlayTime(delMapReq);
+                playService.stopShareMap(delMapReq);
+            }
+
+            String result = "공유 중지가 완료되었습니다.";
             return new BaseResponse<>(result);
         } catch (BaseException exception) {
             return new BaseResponse<>((exception.getStatus()));

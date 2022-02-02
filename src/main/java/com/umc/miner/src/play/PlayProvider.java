@@ -22,6 +22,25 @@ public class PlayProvider {
         this.playDao = playDao;
     }
 
+
+    // 공유 중지할 맵의 플레이정보 있는지 확인
+    public int checkPlayTime(int mapIdx) throws BaseException {
+        try {
+            return playDao.checkPlayTime(mapIdx);
+        } catch (Exception exception) {
+            throw new BaseException(DATABASE_ERROR);
+        }
+    }
+
+    // mapIdx 찾기
+    public int getMapIdx(DelMapReq delMapReq) throws BaseException {
+        try {
+            return playDao.getMapIdx(delMapReq);
+        } catch (Exception exception) {
+            throw new BaseException(DATABASE_ERROR);
+        }
+    }
+
     // PlayMap 정보 가져오기 (pw, size)
     public PlayMapInfo loadPlayMapInfo(PostLoadPlayReq postLoadPlayReq) throws BaseException {
         try {
@@ -77,15 +96,6 @@ public class PlayProvider {
             throw new BaseException(DATABASE_ERROR);
         }
     }
-
-//     mapIdx 찾기
-//    public int getMapIdx(DelMapReq delMapReq) throws BaseException {
-//        try {
-//            return playDao.getMapIdx(delMapReq);
-//        } catch (Exception exception) {
-//            throw new BaseException(DATABASE_ERROR);
-//        }
-//    }
 
 
     // 공유된 맵이 총 몇 개인지 알려준다.
