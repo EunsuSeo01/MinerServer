@@ -189,7 +189,7 @@ public class PlayController {
 
 
     /**
-     * 플레이 정보 저장, playCount++
+     * 정보 비교후 플레이 정보 저장, playCount++
      * [PATCH] /miner/playmaps/savePlayInfo
      */
     @ResponseBody
