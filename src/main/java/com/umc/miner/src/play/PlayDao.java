@@ -81,6 +81,42 @@ public class PlayDao {
         return this.jdbcTemplate.queryForObject(lastInsertIdQuery, int.class);
     }
 
+    // 공유 수정 (mapInfo 변경) - body에 mapInfo, nickName, mapName 입력
+    public int modifyMap(PatchMapReq patchMapReq) {
+        String modifyMapQuery = "update PlayMap set mapInfo = ? where (editorIdx = ?) and (mapName = ?)";
+        Object[] modifyMapParams = new Object[]{patchMapReq.getMapInfo(), patchMapReq.getEditorIdx(), patchMapReq.getMapName()};
+
+        return this.jdbcTemplate.update(modifyMapQuery, modifyMapParams);
+    }
+
+    // 공유 중지 (DB에서 맵 삭제)
+    public int stopShareMap(DelMapReq delMapReq) {
+        String stopShareMapQuery = "delete from PlayMap where (editorIdx = ?) and (mapName = ?)";
+        Object[] stopShareMapParams = new Object[]{delMapReq.getEditorIdx(), delMapReq.getMapName()};
+
+        return this.jdbcTemplate.update(stopShareMapQuery, stopShareMapParams);
+    }
+
+    // mapIdx 찾기
+    public int getMapIdx(DelMapReq delMapReq) {
+        String getMapIdxQuery = "select mapIdx from PlayMap where (editorIdx = ?) and (mapName = ?)";
+        Object[] getMapIdxParams = new Object[]{delMapReq.getEditorIdx(), delMapReq.getMapName()};
+
+        return this.jdbcTemplate.queryForObject(getMapIdxQuery, int.class, getMapIdxParams);
+    }
+
+    // 공유 중지할 맵 플레이정보 존재 확인
+    public int checkPlayTime(int mapIdx) {
+        String checkPlayTimeQuery = "select exists(select playTimeIdx from PlayTime where mapIdx = ?)";
+        return this.jdbcTemplate.queryForObject(checkPlayTimeQuery, int.class, mapIdx);
+    }
+
+    // 공유 중지한 맵 플레이정보 삭제
+    public int delPlayTime(int mapIdx) {
+        String delPlayTimeQuery = "delete from PlayTime where mapIdx = ?";
+        return this.jdbcTemplate.update(delPlayTimeQuery, mapIdx);
+    }
+
 
     // player 정보가 존재하는지 확인
     public int checkPlayerInfo(PatchSavePlayReq patchSavePlayReq) {
@@ -109,37 +145,6 @@ public class PlayDao {
         int countMapParams = postMapReq.getEditorIdx();
         return this.jdbcTemplate.queryForObject(countMapQuery, int.class, countMapParams);
 
-    }
-
-    // 공유 수정 (mapInfo 변경) - body에 mapInfo, nickName, mapName 입력
-    public int modifyMap(PatchMapReq patchMapReq) {
-        String modifyMapQuery = "update PlayMap set mapInfo = ? where (editorIdx = ?) and (mapName = ?)";
-        Object[] modifyMapParams = new Object[]{patchMapReq.getMapInfo(), patchMapReq.getEditorIdx(), patchMapReq.getMapName()};
-
-        return this.jdbcTemplate.update(modifyMapQuery, modifyMapParams);
-    }
-
-    // 공유 중지 (DB에서 맵 삭제)
-    public int stopShareMap(DelMapReq delMapReq) {
-        String stopShareMapQuery = "delete from PlayMap where (editorIdx = ?) and (mapName = ?)";
-        Object[] stopShareMapParams = new Object[]{delMapReq.getEditorIdx(), delMapReq.getMapName()};
-
-        return this.jdbcTemplate.update(stopShareMapQuery, stopShareMapParams);
-    }
-
-
-    // mapIdx 찾기
-    public int getMapIdx(DelMapReq delMapReq) {
-        String getMapIdxQuery = "select mapIdx from PlayMap where (editorIdx = ?) and (mapName = ?)";
-        Object[] getMapIdxParams = new Object[]{delMapReq.getEditorIdx(), delMapReq.getMapName()};
-
-        return this.jdbcTemplate.queryForObject(getMapIdxQuery, int.class, getMapIdxParams);
-    }
-
-    // 공유 중지한 맵 플레이정보 삭제
-    public int delPlayTime(int mapIdx) {
-        String delPlayTimeQuery = "delete from PlayTime where mapIdx = ?";
-        return this.jdbcTemplate.update(delPlayTimeQuery, mapIdx);
     }
 
     // 공유된 맵이 총 몇 개인지 알려준다.
