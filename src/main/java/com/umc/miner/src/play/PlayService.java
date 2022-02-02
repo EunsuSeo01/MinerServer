@@ -48,40 +48,27 @@ public class PlayService {
         }
     }
 
-
     // 공유 중지
     public void stopShareMap(DelMapReq delMapReq) throws BaseException {
         try {
-            int status = 0;
-            int resStopShare = 0;
-            int mapIdx = 0;
-
-            try {
-                mapIdx = playDao.getMapIdx(delMapReq);
-                System.out.println(mapIdx);
-
-            } catch (Exception exception) {
-                status = 1;
-//                System.out.println("0");
-                throw new BaseException(DATABASE_ERROR);
+            int result = playDao.stopShareMap(delMapReq);
+            if (result == 0) {
+                throw new BaseException(FAILED_TO_DELETE_SHARED_MAP);
             }
+        } catch (Exception exception) {
+            throw new BaseException(DATABASE_ERROR);
+        }
+    }
 
-            if (status == 0) {
-                resStopShare = playDao.stopShareMap(delMapReq);
 
-                if (resStopShare == 0) {
-                    throw new BaseException(FAILED_TO_DELETE_SHARED_MAP);
-                }
+    // 공유 중지할 맵 플레이정보 삭제
+    public void delPlayTime(DelMapReq delMapReq) throws BaseException {
+        try {
+            int mapIdx = playProvider.getMapIdx(delMapReq);
+            int result = playDao.delPlayTime(mapIdx);
+            if (result == 0) {
+                throw new BaseException(FAILED_TO_DELETE_PLAY_TIME);
             }
-
-            if (resStopShare != 0 && mapIdx !=0) {
-                int result = playDao.delPlayTime(mapIdx);
-
-                if (result == 0) {
-                    throw new BaseException(FAILED_TO_DELETE_PLAY_TIME);
-                }
-            }
-
         } catch (Exception exception) {
             throw new BaseException(DATABASE_ERROR);
         }
