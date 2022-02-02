@@ -9,7 +9,7 @@ import org.springframework.stereotype.Service;
 
 import java.util.List;
 
-import static com.umc.miner.config.BaseResponseStatus.DATABASE_ERROR;
+import static com.umc.miner.config.BaseResponseStatus.*;
 
 @Service
 public class PlayProvider {
@@ -45,7 +45,7 @@ public class PlayProvider {
         try {
             return playDao.checkPlayerInfo(patchSavePlayReq);
         } catch (Exception exception) {
-            throw new BaseException(DATABASE_ERROR);
+            throw new BaseException(FAILED_ACCOUNT);
         }
     }
 
@@ -66,6 +66,15 @@ public class PlayProvider {
             return patchSavePlayReq.getPlayerName();
         } catch (Exception exception) {
             throw new BaseException(DATABASE_ERROR);
+        }
+    }
+
+    // save할 때 playCount 업데이트
+    public void playCount(PatchSavePlayReq patchSavePlayReq) throws BaseException {
+        try {
+            playDao.playCount(patchSavePlayReq);
+        } catch (Exception exception) {
+            throw new BaseException(FAILED_PLAYCOUNT);
         }
     }
 

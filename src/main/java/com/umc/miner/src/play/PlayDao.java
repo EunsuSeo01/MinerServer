@@ -48,11 +48,12 @@ public class PlayDao {
 
     // PlayTimeInfo 불러오기
     public List<PlayTimeInfo> loadPlayTimeInfo(PostLoadPlayReq postLoadPlayReq) {
-        String loadPlayTimeQuery = "select userIdx, playTime from PlayTime where mapIdx = ? ";
+        String loadPlayTimeQuery = "select userIdx, playerName, playTime from PlayTime where mapIdx = ? ";
 
         return this.jdbcTemplate.query(loadPlayTimeQuery,
                 (rs, rowNum) -> new PlayTimeInfo(
                         rs.getInt("userIdx"),
+                        rs.getString("playerName"),
                         rs.getTime("playTime")
                 ), // RowMapper(위의 링크 참조): 원하는 결과값 형태로 받기
                 postLoadPlayReq.getMapIdx()
@@ -61,8 +62,8 @@ public class PlayDao {
 
     // playInfo 저장하기
     public int savePlayInfo(PatchSavePlayReq patchSavePlayReq) {
-        String savePlayQuery = "insert into PlayTime (userIdx, mapIdx, playTime) VALUES (?,?,?)";
-        Object[] savePlayParams = new Object[]{patchSavePlayReq.getPlayerIdx(), patchSavePlayReq.getMapIdx(), patchSavePlayReq.getPlayTime()};
+        String savePlayQuery = "insert into PlayTime (userIdx, playerName, mapIdx, playTime) VALUES (?,?,?,?)";
+        Object[] savePlayParams = new Object[]{patchSavePlayReq.getPlayerIdx(), patchSavePlayReq.getPlayerName(), patchSavePlayReq.getMapIdx(), patchSavePlayReq.getPlayTime()};
         this.jdbcTemplate.update(savePlayQuery, savePlayParams);
 
         String lastInsertIdQuery = "select last_insert_id()";
@@ -93,6 +94,13 @@ public class PlayDao {
         String updatePlayQuery = "update PlayTime set playTime = ? where (userIdx = ?) AND (mapIdx = ?)";
         Object[] updatePlayParams = new Object[]{patchSavePlayReq.getPlayTime(), patchSavePlayReq.getPlayerIdx(), patchSavePlayReq.getMapIdx()};
         return this.jdbcTemplate.update(updatePlayQuery, updatePlayParams);
+    }
+
+    // playCount update
+    public void playCount(PatchSavePlayReq patchSavePlayReq) {
+        String countPlayQuery = "update PlayMap set playCount = playCount + 1 where mapIdx = ?";
+        Object[] countPlayParams = new Object[]{patchSavePlayReq.getMapIdx()};
+        this.jdbcTemplate.update(countPlayQuery, countPlayParams);
     }
 
     // 각 유저가 공유했던 맵 개수 세기

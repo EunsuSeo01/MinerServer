@@ -189,7 +189,7 @@ public class PlayController {
 
 
     /**
-     * 플레이 정보 저장
+     * 플레이 정보 저장, playCount++
      * [PATCH] /miner/playmaps/savePlayInfo
      */
     @ResponseBody
@@ -206,8 +206,14 @@ public class PlayController {
 
             if (playProvider.checkPlayerInfo(patchSavePlayReq) == 0) {
                 patchSavePlayRes.setPlayerName(playProvider.savePlayInfo(patchSavePlayReq));
+                // play count ++
+                playProvider.playCount(patchSavePlayReq);
+
             } else {
                 patchSavePlayRes.setPlayerName(playProvider.updatePlayerInfo(patchSavePlayReq));
+                // play count ++
+                playProvider.playCount(patchSavePlayReq);
+
             }
             return new BaseResponse<>(patchSavePlayRes);
         } catch (BaseException exception) {
