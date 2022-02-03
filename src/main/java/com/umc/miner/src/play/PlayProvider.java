@@ -140,4 +140,19 @@ public class PlayProvider {
         }
     }
 
+    public int checkValidMap(GetMapInfoReq getMapInfoReq) throws BaseException {
+        try {
+            return playDao.checkValidMap(getMapInfoReq);
+        } catch (Exception exception) {
+            throw new BaseException(DATABASE_ERROR);
+        }
+    }
+
+    public List<GetMapInfoRes> getMapInfo(GetMapInfoReq getMapInfoReq) throws BaseException {
+        //try {
+            return playDao.getMapInfo(getMapInfoReq);
+        //} catch (Exception exception) {
+         //   throw new BaseException(DATABASE_ERROR);
+        //}
+    }
 }
