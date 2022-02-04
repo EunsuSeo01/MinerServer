@@ -5,7 +5,6 @@ import com.umc.miner.src.play.model.*;
 import com.umc.miner.src.user.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.jdbc.core.JdbcTemplate;
-import org.springframework.security.core.parameters.P;
 import org.springframework.stereotype.Repository;
 
 import javax.sql.DataSource;
@@ -273,5 +272,19 @@ public class PlayDao {
             }
 
         }
+    }
+
+    public int checkValidMap(GetMapInfoReq getMapInfoReq) {
+        String checkValidMapQuery = "select exists(select mapIdx from PlayMap where editorName = ? AND mapName = ?)";
+        Object[] checkValidMapParams = new Object[]{getMapInfoReq.getMapName(), getMapInfoReq.getMapName()};
+        return this.jdbcTemplate.queryForObject(checkValidMapQuery, int.class, checkValidMapParams);
+    }
+
+    public List<GetMapInfoRes> getMapInfo(GetMapInfoReq getMapInfoReq) {
+        return this.jdbcTemplate.query("select mapInfo, mapSize from PlayMap where editorName = ? AND mapName = ?",
+                (rs, rowNum) -> new GetMapInfoRes(
+                        rs.getString("mapInfo"),
+                        rs.getInt("mapSize")
+                ), getMapInfoReq.getEditorName(), getMapInfoReq.getMapName());
     }
 }

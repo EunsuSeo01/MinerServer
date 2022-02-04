@@ -18,7 +18,7 @@ import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 
-import static com.umc.miner.config.BaseResponseStatus.FAILED_TO_SHARE_MAP;
+import static com.umc.miner.config.BaseResponseStatus.*;
 
 
 @RestController
@@ -150,6 +150,25 @@ public class PlayController {
             return new BaseResponse<>((exception.getStatus()));
         }
     }
+
+    /**
+     * 맵 배열 정보 가져오는 API
+     * [POST] /miner/playmaps/info
+     */
+    @ResponseBody
+    @PostMapping("/info")
+    public BaseResponse<List<GetMapInfoRes>> getMapInfo(@RequestBody GetMapInfoReq getMapInfoReq) {
+        try {
+            if (playProvider.checkValidMap(getMapInfoReq) == 0) {
+                return new BaseResponse<>(NOT_EXISTS_MAP);
+            }
+
+            return new BaseResponse<>(playProvider.getMapInfo(getMapInfoReq));
+        } catch (BaseException exception) {
+        return new BaseResponse<>((exception.getStatus()));
+        }
+    }
+
 
     /**
      * 미로맵 클릭 시 mapPassword, mapSize, user, playTime을 알려준다.
