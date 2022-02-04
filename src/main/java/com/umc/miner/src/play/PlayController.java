@@ -152,13 +152,14 @@ public class PlayController {
     }
 
     /**
-     * 맵 배열 정보 가져오는 API
+     * 맵 배열 관련 정보 가져오는 API
      * [POST] /miner/playmaps/info
      */
     @ResponseBody
     @PostMapping("/info")
     public BaseResponse<List<GetMapInfoRes>> getMapInfo(@RequestBody GetMapInfoReq getMapInfoReq) {
         try {
+            // Req에 관한 맵이 존재하는 맵에 대한 정보인지 확인.
             if (playProvider.checkValidMap(getMapInfoReq) == 0) {
                 return new BaseResponse<>(NOT_EXISTS_MAP);
             }
