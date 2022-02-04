@@ -22,6 +22,24 @@ public class PlayProvider {
         this.playDao = playDao;
     }
 
+    // 공유 중지할 맵의 플레이정보 있는지 확인
+    public int checkPlayTime(int mapIdx) throws BaseException {
+        try {
+            return playDao.checkPlayTime(mapIdx);
+        } catch (Exception exception) {
+            throw new BaseException(DATABASE_ERROR);
+        }
+    }
+
+    // mapIdx 찾기
+    public int getMapIdx(DelMapReq delMapReq) throws BaseException {
+        try {
+            return playDao.getMapIdx(delMapReq);
+        } catch (Exception exception) {
+            throw new BaseException(DATABASE_ERROR);
+        }
+    }
+
     // PlayMap 정보 가져오기 (pw, size)
     public PlayMapInfo loadPlayMapInfo(PostLoadPlayReq postLoadPlayReq) throws BaseException {
         try {
@@ -96,19 +114,11 @@ public class PlayProvider {
         }
     }
 
-//     mapIdx 찾기
-//    public int getMapIdx(DelMapReq delMapReq) throws BaseException {
-//        try {
-//            return playDao.getMapIdx(delMapReq);
-//        } catch (Exception exception) {
-//            throw new BaseException(DATABASE_ERROR);
-//        }
-//    }
-
 
     // 공유된 맵이 총 몇 개인지 알려준다.
     public int getTotalNumOfPlayMap(GetPagingReq getPagingReq) throws BaseException {
         try {
+            // 인풋 필드가 있으면 검색결과에 부합하는 맵이 몇 개인지 알려줘야 함.
             if (getPagingReq.getSearchContent() != null) {
                 return playDao.getSearchedNumOfPlayMap(getPagingReq);
             } else {
@@ -140,4 +150,21 @@ public class PlayProvider {
         }
     }
 
+    // Req에 관한 맵이 존재하는 맵에 대한 정보인지 확인.
+    public int checkValidMap(GetMapInfoReq getMapInfoReq) throws BaseException {
+        try {
+            return playDao.checkValidMap(getMapInfoReq);
+        } catch (Exception exception) {
+            throw new BaseException(DATABASE_ERROR);
+        }
+    }
+
+    // 맵 배열 정보 & 사이즈 정보를 가져온다.
+    public List<GetMapInfoRes> getMapInfo(GetMapInfoReq getMapInfoReq) throws BaseException {
+        try {
+            return playDao.getMapInfo(getMapInfoReq);
+        } catch (Exception exception) {
+            throw new BaseException(DATABASE_ERROR);
+        }
+    }
 }

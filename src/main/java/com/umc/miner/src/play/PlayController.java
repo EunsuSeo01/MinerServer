@@ -18,7 +18,7 @@ import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 
-import static com.umc.miner.config.BaseResponseStatus.FAILED_TO_SHARE_MAP;
+import static com.umc.miner.config.BaseResponseStatus.*;
 
 
 @RestController
@@ -89,10 +89,20 @@ public class PlayController {
     public BaseResponse<String> stopShareMap(@RequestBody DelMapReq delMapReq) {
         try {
             delMapReq.setEditorIdx(userProvider.getEditorIdx(delMapReq.getNickName())); //delMapReq 속 editorIdx에 값 set함
+            int mapIdx = playProvider.getMapIdx(delMapReq);
 
-            playService.stopShareMap(delMapReq);
+            // 공유 중지할 맵의 플레이 정보가 없을 경우 : 맵만 삭제
+            if (playProvider.checkPlayTime(mapIdx) == 0) {
+                playService.stopShareMap(delMapReq);
+            }
 
-            String result = "공유 삭제가 완료되었습니다.";
+            // 공유 중지할 맵의 플레이 정보가 있는 경우 : 플레이 정보 삭제 후 맵 삭제
+            if (playProvider.checkPlayTime(mapIdx) == 1) {
+                playService.delPlayTime(delMapReq);
+                playService.stopShareMap(delMapReq);
+            }
+
+            String result = "공유 중지가 완료되었습니다.";
             return new BaseResponse<>(result);
         } catch (BaseException exception) {
             return new BaseResponse<>((exception.getStatus()));
@@ -140,6 +150,26 @@ public class PlayController {
             return new BaseResponse<>((exception.getStatus()));
         }
     }
+
+    /**
+     * 맵 배열 관련 정보 가져오는 API
+     * [POST] /miner/playmaps/info
+     */
+    @ResponseBody
+    @PostMapping("/info")
+    public BaseResponse<List<GetMapInfoRes>> getMapInfo(@RequestBody GetMapInfoReq getMapInfoReq) {
+        try {
+            // Req에 관한 맵이 존재하는 맵에 대한 정보인지 확인.
+            if (playProvider.checkValidMap(getMapInfoReq) == 0) {
+                return new BaseResponse<>(NOT_EXISTS_MAP);
+            }
+
+            return new BaseResponse<>(playProvider.getMapInfo(getMapInfoReq));
+        } catch (BaseException exception) {
+        return new BaseResponse<>((exception.getStatus()));
+        }
+    }
+
 
     /**
      * 미로맵 클릭 시 mapPassword, mapSize, user, playTime을 알려준다.

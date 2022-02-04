@@ -5,7 +5,6 @@ import com.umc.miner.src.play.model.*;
 import com.umc.miner.src.user.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.jdbc.core.JdbcTemplate;
-import org.springframework.security.core.parameters.P;
 import org.springframework.stereotype.Repository;
 
 import javax.sql.DataSource;
@@ -81,6 +80,42 @@ public class PlayDao {
         return this.jdbcTemplate.queryForObject(lastInsertIdQuery, int.class);
     }
 
+    // 공유 수정 (mapInfo 변경) - body에 mapInfo, nickName, mapName 입력
+    public int modifyMap(PatchMapReq patchMapReq) {
+        String modifyMapQuery = "update PlayMap set mapInfo = ? where (editorIdx = ?) and (mapName = ?)";
+        Object[] modifyMapParams = new Object[]{patchMapReq.getMapInfo(), patchMapReq.getEditorIdx(), patchMapReq.getMapName()};
+
+        return this.jdbcTemplate.update(modifyMapQuery, modifyMapParams);
+    }
+
+    // 공유 중지 (DB에서 맵 삭제)
+    public int stopShareMap(DelMapReq delMapReq) {
+        String stopShareMapQuery = "delete from PlayMap where (editorIdx = ?) and (mapName = ?)";
+        Object[] stopShareMapParams = new Object[]{delMapReq.getEditorIdx(), delMapReq.getMapName()};
+
+        return this.jdbcTemplate.update(stopShareMapQuery, stopShareMapParams);
+    }
+
+    // mapIdx 찾기
+    public int getMapIdx(DelMapReq delMapReq) {
+        String getMapIdxQuery = "select mapIdx from PlayMap where (editorIdx = ?) and (mapName = ?)";
+        Object[] getMapIdxParams = new Object[]{delMapReq.getEditorIdx(), delMapReq.getMapName()};
+
+        return this.jdbcTemplate.queryForObject(getMapIdxQuery, int.class, getMapIdxParams);
+    }
+
+    // 공유 중지할 맵 플레이정보 존재 확인
+    public int checkPlayTime(int mapIdx) {
+        String checkPlayTimeQuery = "select exists(select playTimeIdx from PlayTime where mapIdx = ?)";
+        return this.jdbcTemplate.queryForObject(checkPlayTimeQuery, int.class, mapIdx);
+    }
+
+    // 공유 중지한 맵 플레이정보 삭제
+    public int delPlayTime(int mapIdx) {
+        String delPlayTimeQuery = "delete from PlayTime where mapIdx = ?";
+        return this.jdbcTemplate.update(delPlayTimeQuery, mapIdx);
+    }
+
 
     // player 정보가 존재하는지 확인
     public int checkPlayerInfo(PatchSavePlayReq patchSavePlayReq) {
@@ -111,37 +146,6 @@ public class PlayDao {
 
     }
 
-    // 공유 수정 (mapInfo 변경) - body에 mapInfo, nickName, mapName 입력
-    public int modifyMap(PatchMapReq patchMapReq) {
-        String modifyMapQuery = "update PlayMap set mapInfo = ? where (editorIdx = ?) and (mapName = ?)";
-        Object[] modifyMapParams = new Object[]{patchMapReq.getMapInfo(), patchMapReq.getEditorIdx(), patchMapReq.getMapName()};
-
-        return this.jdbcTemplate.update(modifyMapQuery, modifyMapParams);
-    }
-
-    // 공유 중지 (DB에서 맵 삭제)
-    public int stopShareMap(DelMapReq delMapReq) {
-        String stopShareMapQuery = "delete from PlayMap where (editorIdx = ?) and (mapName = ?)";
-        Object[] stopShareMapParams = new Object[]{delMapReq.getEditorIdx(), delMapReq.getMapName()};
-
-        return this.jdbcTemplate.update(stopShareMapQuery, stopShareMapParams);
-    }
-
-
-    // mapIdx 찾기
-    public int getMapIdx(DelMapReq delMapReq) {
-        String getMapIdxQuery = "select mapIdx from PlayMap where (editorIdx = ?) and (mapName = ?)";
-        Object[] getMapIdxParams = new Object[]{delMapReq.getEditorIdx(), delMapReq.getMapName()};
-
-        return this.jdbcTemplate.queryForObject(getMapIdxQuery, int.class, getMapIdxParams);
-    }
-
-    // 공유 중지한 맵 플레이정보 삭제
-    public int delPlayTime(int mapIdx) {
-        String delPlayTimeQuery = "delete from PlayTime where mapIdx = ?";
-        return this.jdbcTemplate.update(delPlayTimeQuery, mapIdx);
-    }
-
     // 공유된 맵이 총 몇 개인지 알려준다.
     public int getTotalNumOfPlayMap() {
         String getTotalNumQuery = "select count(mapIdx) from PlayMap where status = ?";
@@ -158,8 +162,8 @@ public class PlayDao {
         }
         // 닉네임명 검색.
         else {
-            getSearchedNumQuery = "select count(mapIdx) from PlayMap where status = ? and editorIdx = ?";
-            return this.jdbcTemplate.queryForObject(getSearchedNumQuery, int.class, "active", userDao.getEditorIdx(getPagingReq.getSearchContent()));
+            getSearchedNumQuery = "select count(mapIdx) from PlayMap where status = ? and editorName = ?";
+            return this.jdbcTemplate.queryForObject(getSearchedNumQuery, int.class, "active", getPagingReq.getSearchContent());
         }
 
     }
@@ -204,7 +208,7 @@ public class PlayDao {
         if (getPagingReq.getOrderType() == 1) {
             // 닉네임명 검색.
             if (getPagingReq.getSearchType() == 0) {
-                return this.jdbcTemplate.query("select * from PlayMap where status = ? and editorIdx = ? order by updateAt desc limit ? offset ?",
+                return this.jdbcTemplate.query("select * from PlayMap where status = ? and editorName = ? order by updateAt desc limit ? offset ?",
                         (rs, rowNum) -> new GetPlayMapRes(
                                 rs.getString("mapName"),
                                 rs.getString("mapInfo"),
@@ -215,7 +219,7 @@ public class PlayDao {
                                 rs.getString("status"),
                                 rs.getString("createAt"),
                                 rs.getString("updateAt")
-                        ), "active", userDao.getEditorIdx(getPagingReq.getSearchContent()), mapNumPerPage, (getPagingReq.getPageNo() - 1) * mapNumPerPage);
+                        ), "active", getPagingReq.getSearchContent(), mapNumPerPage, (getPagingReq.getPageNo() - 1) * mapNumPerPage);
             }
             // 미로명 검색.
             else {
@@ -238,7 +242,7 @@ public class PlayDao {
         else {
             // 닉네임명 검색.
             if (getPagingReq.getSearchType() == 0) {
-                return this.jdbcTemplate.query("select * from PlayMap where status = ? and editorIdx = ? order by playCount desc limit ? offset ?",
+                return this.jdbcTemplate.query("select * from PlayMap where status = ? and editorName = ? order by playCount desc limit ? offset ?",
                         (rs, rowNum) -> new GetPlayMapRes(
                                 rs.getString("mapName"),
                                 rs.getString("mapInfo"),
@@ -249,7 +253,7 @@ public class PlayDao {
                                 rs.getString("status"),
                                 rs.getString("createAt"),
                                 rs.getString("updateAt")
-                        ), "active", userDao.getEditorIdx(getPagingReq.getSearchContent()), mapNumPerPage, (getPagingReq.getPageNo() - 1) * mapNumPerPage);
+                        ), "active", getPagingReq.getSearchContent(), mapNumPerPage, (getPagingReq.getPageNo() - 1) * mapNumPerPage);
             }
             // 미로명 검색.
             else {
@@ -268,5 +272,21 @@ public class PlayDao {
             }
 
         }
+    }
+
+    // Req에 관한 맵이 존재하는 맵에 대한 정보인지 확인.
+    public int checkValidMap(GetMapInfoReq getMapInfoReq) {
+        String checkValidMapQuery = "select exists(select mapIdx from PlayMap where editorName = ? AND mapName = ?)";
+        Object[] checkValidMapParams = new Object[]{getMapInfoReq.getMapName(), getMapInfoReq.getMapName()};
+        return this.jdbcTemplate.queryForObject(checkValidMapQuery, int.class, checkValidMapParams);
+    }
+
+    // 맵 배열 정보 & 사이즈 정보를 가져온다.
+    public List<GetMapInfoRes> getMapInfo(GetMapInfoReq getMapInfoReq) {
+        return this.jdbcTemplate.query("select mapInfo, mapSize from PlayMap where editorName = ? AND mapName = ?",
+                (rs, rowNum) -> new GetMapInfoRes(
+                        rs.getString("mapInfo"),
+                        rs.getInt("mapSize")
+                ), getMapInfoReq.getEditorName(), getMapInfoReq.getMapName());
     }
 }

@@ -41,6 +41,10 @@ public enum BaseResponseStatus {
     POST_USERS_INVALID_NAME(false, 2019, "6자 미만으로 설정해주세요."),
     POST_USERS_EXISTS_NAME(false, 2020,"이미 존재하는 닉네임입니다."),
 
+    // [POST] /email
+    POST_EMAIL_EMPTY_EMAIL(false, 2021, "인증번호를 입력해주세요"),
+    POST_EMAIL_FAIL_EMAIL(false, 2022, "인증번호가 틀립니다."),
+
     // 전화번호 형식 확인
     INVALID_PHONENUM(false, 2025, "전화번호 형식을 확인해주세요."),
 
@@ -54,9 +58,8 @@ public enum BaseResponseStatus {
     PATCH_USERS_INVALID_PASSWORD(false, 2034, "비밀번호 형식을 확인해주세요."),
     PATCH_USERS_EMPTY_EMAIL(false, 2035, "이메일을 입력해주세요."),
 
-    // [POST] /email
-    POST_EMAIL_EMPTY_EMAIL(false, 2021, "인증번호를 입력해주세요"),
-    POST_EMAIL_FAIL_EMAIL(false, 2022, "인증번호가 틀립니다."),
+
+    NOT_EXISTS_MAP(false, 2040, "존재하지 않는 맵입니다."),
 
 
     /**
