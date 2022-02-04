@@ -51,11 +51,11 @@ public class PlayProvider {
 
     // mapIdx로 playTime가져오기
     public List<PlayTimeInfo> loadPlayTimeInfo(PostLoadPlayReq postLoadPlayReq) throws BaseException {
-        try {
+//        try {
             return playDao.loadPlayTimeInfo(postLoadPlayReq);
-        } catch (Exception exception) {
-            throw new BaseException(DATABASE_ERROR);
-        }
+//        } catch (Exception exception) {
+//            throw new BaseException(DATABASE_ERROR);
+//        }
     }
 
     // save 전 Player정보가 있는지  확인
@@ -93,6 +93,15 @@ public class PlayProvider {
             playDao.playCount(patchSavePlayReq);
         } catch (Exception exception) {
             throw new BaseException(FAILED_PLAYCOUNT);
+        }
+    }
+
+    // PlayTime 가져올 때
+    public PlayMapInfo checkPlayTime(PostLoadPlayReq postLoadPlayReq) throws BaseException {
+        try {
+            return playDao.loadPlayMapInfo(postLoadPlayReq);
+        } catch (Exception exception) {
+            throw new BaseException(DATABASE_ERROR);
         }
     }
 

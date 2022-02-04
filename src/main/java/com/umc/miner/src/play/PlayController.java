@@ -195,21 +195,25 @@ public class PlayController {
             List<PlayTimeInfo> playTimeInfoList = playProvider.loadPlayTimeInfo(postLoadPlayReq);
             postLoadPlayRes.setPlayInfoList(playTimeInfoList);
 
+            if (playTimeInfoList.size() == 0) {
+                postLoadPlayRes.setAvgPlayTime(0);
+            } else {
 
-            //PlayTime average
-            int totalSec = 0;
-            int userCount = 0;
-            for (int i = 0; i < playTimeInfoList.size(); i++) {
-                String stringTemp = playTimeInfoList.get(i).getPlayTime().toString();
+                //PlayTime average
+                int totalSec = 0;
+                int userCount = 0;
+                for (int i = 0; i < playTimeInfoList.size(); i++) {
+                    String stringTemp = playTimeInfoList.get(i).getPlayTime().toString();
 
-                String[] hourMin = stringTemp.split(":");
-                int hour = Integer.parseInt(hourMin[0]);
-                int mins = Integer.parseInt(hourMin[1]);
-                int sec = Integer.parseInt(hourMin[2]);
-                totalSec += (hour * 360) + (mins * 60) + sec;
-                userCount++;
+                    String[] hourMin = stringTemp.split(":");
+                    int hour = Integer.parseInt(hourMin[0]);
+                    int mins = Integer.parseInt(hourMin[1]);
+                    int sec = Integer.parseInt(hourMin[2]);
+                    totalSec += (hour * 360) + (mins * 60) + sec;
+                    userCount++;
+                }
+                postLoadPlayRes.setAvgPlayTime(totalSec / userCount);
             }
-            postLoadPlayRes.setAvgPlayTime(totalSec / userCount);
             return new BaseResponse<>(postLoadPlayRes);
 
         } catch (BaseException exception) {
@@ -219,7 +223,7 @@ public class PlayController {
 
 
     /**
-     * 플레이 정보 저장, playCount++
+     * 정보 비교후 플레이 정보 저장, playCount++
      * [PATCH] /miner/playmaps/savePlayInfo
      */
     @ResponseBody
