@@ -101,7 +101,7 @@ public class PlayController {
                 playService.delPlayTime(mapIdx);
             }
 
-            String result = "공유 삭제가 완료되었습니다.";
+            String result = "공유 중지가 완료되었습니다.";
             return new BaseResponse<>(result);
         } catch (BaseException exception) {
             TransactionAspectSupport.currentTransactionStatus().setRollbackOnly();
