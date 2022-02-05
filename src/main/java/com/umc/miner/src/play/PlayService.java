@@ -62,9 +62,8 @@ public class PlayService {
 
 
     // 공유 중지할 맵 플레이정보 삭제
-    public void delPlayTime(DelMapReq delMapReq) throws BaseException {
+    public void delPlayTime(int mapIdx) throws BaseException {
         try {
-            int mapIdx = playProvider.getMapIdx(delMapReq);
             int result = playDao.delPlayTime(mapIdx);
             if (result == 0) {
                 throw new BaseException(FAILED_TO_DELETE_PLAY_TIME);
