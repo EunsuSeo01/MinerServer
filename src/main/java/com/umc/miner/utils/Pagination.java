@@ -25,8 +25,12 @@ public class Pagination {
     public void pageInfo(int totalMapNum) {
         this.totalMapNum = totalMapNum;
 
-        // 전체 페이지 수
-        this.totalPage = (int)Math.ceil((double)totalMapNum / dataPerPage);
+        if (totalPage != 0) {
+            // 전체 페이지 수
+            this.totalPage = (int)Math.ceil((double)totalMapNum / dataPerPage);
+        } else {
+            this.totalPage = 1;
+        }
 
         // 시작 페이지
         this.startPage = 1;

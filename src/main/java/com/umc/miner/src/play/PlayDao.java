@@ -5,7 +5,6 @@ import com.umc.miner.src.play.model.*;
 import com.umc.miner.src.user.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.jdbc.core.JdbcTemplate;
-import org.springframework.security.core.parameters.P;
 import org.springframework.stereotype.Repository;
 
 import javax.sql.DataSource;
@@ -163,8 +162,8 @@ public class PlayDao {
         }
         // 닉네임명 검색.
         else {
-            getSearchedNumQuery = "select count(mapIdx) from PlayMap where status = ? and editorIdx = ?";
-            return this.jdbcTemplate.queryForObject(getSearchedNumQuery, int.class, "active", userDao.getEditorIdx(getPagingReq.getSearchContent()));
+            getSearchedNumQuery = "select count(mapIdx) from PlayMap where status = ? and editorName = ?";
+            return this.jdbcTemplate.queryForObject(getSearchedNumQuery, int.class, "active", getPagingReq.getSearchContent());
         }
 
     }
@@ -209,7 +208,7 @@ public class PlayDao {
         if (getPagingReq.getOrderType() == 1) {
             // 닉네임명 검색.
             if (getPagingReq.getSearchType() == 0) {
-                return this.jdbcTemplate.query("select * from PlayMap where status = ? and editorIdx = ? order by updateAt desc limit ? offset ?",
+                return this.jdbcTemplate.query("select * from PlayMap where status = ? and editorName = ? order by updateAt desc limit ? offset ?",
                         (rs, rowNum) -> new GetPlayMapRes(
                                 rs.getString("mapName"),
                                 rs.getString("mapInfo"),
@@ -220,7 +219,7 @@ public class PlayDao {
                                 rs.getString("status"),
                                 rs.getString("createAt"),
                                 rs.getString("updateAt")
-                        ), "active", userDao.getEditorIdx(getPagingReq.getSearchContent()), mapNumPerPage, (getPagingReq.getPageNo() - 1) * mapNumPerPage);
+                        ), "active", getPagingReq.getSearchContent(), mapNumPerPage, (getPagingReq.getPageNo() - 1) * mapNumPerPage);
             }
             // 미로명 검색.
             else {
@@ -243,7 +242,7 @@ public class PlayDao {
         else {
             // 닉네임명 검색.
             if (getPagingReq.getSearchType() == 0) {
-                return this.jdbcTemplate.query("select * from PlayMap where status = ? and editorIdx = ? order by playCount desc limit ? offset ?",
+                return this.jdbcTemplate.query("select * from PlayMap where status = ? and editorName = ? order by playCount desc limit ? offset ?",
                         (rs, rowNum) -> new GetPlayMapRes(
                                 rs.getString("mapName"),
                                 rs.getString("mapInfo"),
@@ -254,7 +253,7 @@ public class PlayDao {
                                 rs.getString("status"),
                                 rs.getString("createAt"),
                                 rs.getString("updateAt")
-                        ), "active", userDao.getEditorIdx(getPagingReq.getSearchContent()), mapNumPerPage, (getPagingReq.getPageNo() - 1) * mapNumPerPage);
+                        ), "active", getPagingReq.getSearchContent(), mapNumPerPage, (getPagingReq.getPageNo() - 1) * mapNumPerPage);
             }
             // 미로명 검색.
             else {
@@ -273,5 +272,21 @@ public class PlayDao {
             }
 
         }
+    }
+
+    // Req에 관한 맵이 존재하는 맵에 대한 정보인지 확인.
+    public int checkValidMap(GetMapInfoReq getMapInfoReq) {
+        String checkValidMapQuery = "select exists(select mapIdx from PlayMap where editorName = ? AND mapName = ?)";
+        Object[] checkValidMapParams = new Object[]{getMapInfoReq.getMapName(), getMapInfoReq.getMapName()};
+        return this.jdbcTemplate.queryForObject(checkValidMapQuery, int.class, checkValidMapParams);
+    }
+
+    // 맵 배열 정보 & 사이즈 정보를 가져온다.
+    public List<GetMapInfoRes> getMapInfo(GetMapInfoReq getMapInfoReq) {
+        return this.jdbcTemplate.query("select mapInfo, mapSize from PlayMap where editorName = ? AND mapName = ?",
+                (rs, rowNum) -> new GetMapInfoRes(
+                        rs.getString("mapInfo"),
+                        rs.getInt("mapSize")
+                ), getMapInfoReq.getEditorName(), getMapInfoReq.getMapName());
     }
 }
