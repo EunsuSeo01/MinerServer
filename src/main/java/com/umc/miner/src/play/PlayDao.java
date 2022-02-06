@@ -288,7 +288,7 @@ public class PlayDao {
     // Req에 관한 맵이 존재하는 맵에 대한 정보인지 확인.
     public int checkValidMap(GetMapInfoReq getMapInfoReq) {
         String checkValidMapQuery = "select exists(select mapIdx from PlayMap where editorName = ? AND mapName = ?)";
-        Object[] checkValidMapParams = new Object[]{getMapInfoReq.getMapName(), getMapInfoReq.getMapName()};
+        Object[] checkValidMapParams = new Object[]{getMapInfoReq.getEditorName(), getMapInfoReq.getMapName()};
         return this.jdbcTemplate.queryForObject(checkValidMapQuery, int.class, checkValidMapParams);
     }
 
