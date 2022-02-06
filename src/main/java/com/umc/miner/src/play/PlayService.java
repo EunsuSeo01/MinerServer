@@ -21,7 +21,6 @@ public class PlayService {
 
     @Autowired
     public PlayService(PlayDao playDao, PlayProvider playProvider) {
-
         this.playDao = playDao;
         this.playProvider = playProvider;
     }
@@ -68,6 +67,16 @@ public class PlayService {
             if (result == 0) {
                 throw new BaseException(FAILED_TO_DELETE_PLAY_TIME);
             }
+        } catch (Exception exception) {
+            throw new BaseException(DATABASE_ERROR);
+        }
+    }
+
+    // playInfo update
+    public String updatePlayerInfo(PatchSavePlayReq patchSavePlayReq) throws BaseException {
+        try {
+            playDao.updatePlayerInfo(patchSavePlayReq);
+            return patchSavePlayReq.getPlayerName();
         } catch (Exception exception) {
             throw new BaseException(DATABASE_ERROR);
         }
