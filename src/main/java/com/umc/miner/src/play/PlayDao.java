@@ -46,15 +46,26 @@ public class PlayDao {
     }
 
     // PlayTimeInfo 불러오기
-    public List<PlayTimeInfo> loadPlayTimeInfo(PostLoadPlayReq postLoadPlayReq) {
+    public List<PlayTimeInfo> loadTotalPlayTimeInfo(PostLoadPlayReq postLoadPlayReq) {
         String loadPlayTimeQuery = "select userIdx, playerName, playTime from PlayTime where mapIdx = ? ";
-
         return this.jdbcTemplate.query(loadPlayTimeQuery,
                 (rs, rowNum) -> new PlayTimeInfo(
                         rs.getInt("userIdx"),
                         rs.getString("playerName"),
                         rs.getTime("playTime")
-                ), // RowMapper(위의 링크 참조): 원하는 결과값 형태로 받기
+                ),
+                postLoadPlayReq.getMapIdx()
+        );
+    }
+
+    public List<PlayTimeInfo> loadTenPlayTimeInfo(PostLoadPlayReq postLoadPlayReq) {
+        String loadPlayTimeQuery = "select userIdx, playerName, playTime from PlayTime where mapIdx = ?  order by playTime limit 10";
+        return this.jdbcTemplate.query(loadPlayTimeQuery,
+                (rs, rowNum) -> new PlayTimeInfo(
+                        rs.getInt("userIdx"),
+                        rs.getString("playerName"),
+                        rs.getTime("playTime")
+                ),
                 postLoadPlayReq.getMapIdx()
         );
     }

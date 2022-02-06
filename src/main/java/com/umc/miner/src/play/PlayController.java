@@ -192,18 +192,20 @@ public class PlayController {
             postLoadPlayRes.setMapSize(playMapInfo.getMapSize());
 
             //PlayTime
-            List<PlayTimeInfo> playTimeInfoList = playProvider.loadPlayTimeInfo(postLoadPlayReq);
-            postLoadPlayRes.setPlayInfoList(playTimeInfoList);
+            List<PlayTimeInfo> playTenTimeInfoList = playProvider.loadTenPlayTimeInfo(postLoadPlayReq);
+            postLoadPlayRes.setPlayInfoList(playTenTimeInfoList);
 
-            if (playTimeInfoList.size() == 0) {
+            List<PlayTimeInfo> playTotalTimeInfoList = playProvider.loadTotalPlayTimeInfo(postLoadPlayReq);
+
+            if (playTotalTimeInfoList.size() == 0) {
                 postLoadPlayRes.setAvgPlayTime(0);
             } else {
 
                 //PlayTime average
                 int totalSec = 0;
                 int userCount = 0;
-                for (int i = 0; i < playTimeInfoList.size(); i++) {
-                    String stringTemp = playTimeInfoList.get(i).getPlayTime().toString();
+                for (int i = 0; i < playTotalTimeInfoList.size(); i++) {
+                    String stringTemp = playTotalTimeInfoList.get(i).getPlayTime().toString();
 
                     String[] hourMin = stringTemp.split(":");
                     int hour = Integer.parseInt(hourMin[0]);
@@ -244,7 +246,7 @@ public class PlayController {
                 playProvider.playCount(patchSavePlayReq);
 
             } else {
-                patchSavePlayRes.setPlayerName(playProvider.updatePlayerInfo(patchSavePlayReq));
+                patchSavePlayRes.setPlayerName(playService.updatePlayerInfo(patchSavePlayReq));
                 // play count ++
                 playProvider.playCount(patchSavePlayReq);
 

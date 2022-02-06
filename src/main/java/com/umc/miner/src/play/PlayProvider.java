@@ -50,12 +50,21 @@ public class PlayProvider {
     }
 
     // mapIdx로 playTime가져오기
-    public List<PlayTimeInfo> loadPlayTimeInfo(PostLoadPlayReq postLoadPlayReq) throws BaseException {
-//        try {
-            return playDao.loadPlayTimeInfo(postLoadPlayReq);
-//        } catch (Exception exception) {
-//            throw new BaseException(DATABASE_ERROR);
-//        }
+    public List<PlayTimeInfo> loadTotalPlayTimeInfo(PostLoadPlayReq postLoadPlayReq) throws BaseException {
+        try {
+            return playDao.loadTotalPlayTimeInfo(postLoadPlayReq);
+        } catch (Exception exception) {
+            throw new BaseException(DATABASE_ERROR);
+        }
+    }
+
+    // mapIdx로 상위 10개 playTime가져오기
+    public List<PlayTimeInfo> loadTenPlayTimeInfo(PostLoadPlayReq postLoadPlayReq) throws BaseException {
+        try {
+            return playDao.loadTenPlayTimeInfo(postLoadPlayReq);
+        } catch (Exception exception) {
+            throw new BaseException(DATABASE_ERROR);
+        }
     }
 
     // save 전 Player정보가 있는지  확인
@@ -71,16 +80,6 @@ public class PlayProvider {
     public String savePlayInfo(PatchSavePlayReq patchSavePlayReq) throws BaseException {
         try {
             playDao.savePlayInfo(patchSavePlayReq);
-            return patchSavePlayReq.getPlayerName();
-        } catch (Exception exception) {
-            throw new BaseException(DATABASE_ERROR);
-        }
-    }
-
-    // playInfo update
-    public String updatePlayerInfo(PatchSavePlayReq patchSavePlayReq) throws BaseException {
-        try {
-            playDao.updatePlayerInfo(patchSavePlayReq);
             return patchSavePlayReq.getPlayerName();
         } catch (Exception exception) {
             throw new BaseException(DATABASE_ERROR);

@@ -17,7 +17,4 @@ public class PostLoadPlayRes {
 
     private List<PlayTimeInfo> playInfoList;
 
-    public PostLoadPlayRes(List<PlayTimeInfo> playInfoList){
-        this.playInfoList = playInfoList;
-    }
 }
