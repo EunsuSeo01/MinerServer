@@ -1,31 +1,16 @@
 package com.umc.miner.src.sms;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.databind.ObjectMapper;
 import com.umc.miner.config.BaseException;
 import com.umc.miner.src.sms.model.*;
-import org.apache.commons.codec.binary.Base64;
+import net.nurigo.java_sdk.api.Message;
+import org.json.simple.JSONObject;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.HttpEntity;
-import org.springframework.http.HttpHeaders;
-import org.springframework.http.MediaType;
-import org.springframework.http.client.HttpComponentsClientHttpRequestFactory;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import org.springframework.web.client.RestTemplate;
-
-import javax.crypto.Mac;
-import javax.crypto.spec.SecretKeySpec;
-import java.io.UnsupportedEncodingException;
-import java.net.URI;
-import java.net.URISyntaxException;
-import java.security.InvalidKeyException;
-import java.security.NoSuchAlgorithmException;
-import java.util.ArrayList;
-import java.util.List;
+import java.util.HashMap;
 
 import static com.umc.miner.config.BaseResponseStatus.DATABASE_ERROR;
 
@@ -42,72 +27,33 @@ public class SmsService {
         this.smsDao = smsDao;
     }
 
-    @Value("${sms.serviceId}")
-    private String serviceId;
-    @Value("${sms.accessKey}")
-    private String accessKey;
-    @Value("${sms.secretKey}")
-    private String secretKey;
-    @Value("${sms.senderPhoneNumber}")
-    private String senderPhoneNumber;
+    @Value("${sms.api_key}")
+    private String api_key;
+    @Value("${sms.api_secret}")
+    private String api_secret;
+    @Value("${sms.senderPhoneNum}")
+    private String senderPhoneNum;
 
 
     // 인증문자 전송.
-    public SmsRes sendSms(String recipientPhoneNumber, String content) throws JsonProcessingException, UnsupportedEncodingException, NoSuchAlgorithmException, InvalidKeyException, URISyntaxException {
+    public JSONObject sendSms(String recipientPhoneNum, String authNum) throws BaseException {
+        try {
+            Message coolsms = new Message(api_key, api_secret);
+        
+            // 4 params(to, from, type, text) are mandatory. must be filled
+            HashMap<String, String> params = new HashMap<String, String>();
+            params.put("to", recipientPhoneNum);    // 수신전화번호
+            params.put("from", senderPhoneNum);    // 발신전화번호.
+            params.put("type", "SMS");
+            params.put("text", "[Miner] 인증번호는 " + authNum + "입니다.");
+            params.put("app_version", "miner 1.0.1"); // application name and version
 
-        Long time = System.currentTimeMillis();
-        List<Message> messages = new ArrayList<>();
-        messages.add(new Message(recipientPhoneNumber, content));
-
-        SmsReq smsRequest = new SmsReq("SMS", "COMM", "82", senderPhoneNumber, content, messages);
-        ObjectMapper objectMapper = new ObjectMapper();
-        String jsonBody = objectMapper.writeValueAsString(smsRequest);
-
-        HttpHeaders headers = new HttpHeaders();
-        headers.setContentType(MediaType.APPLICATION_JSON);
-        headers.set("x-ncp-apigw-timestamp", time.toString());
-        headers.set("x-ncp-iam-access-key", this.accessKey);
-        String sig = makeSignature(time); //암호화
-        headers.set("x-ncp-apigw-signature-v2", sig);
-
-        HttpEntity<String> body = new HttpEntity<>(jsonBody,headers);
-
-        RestTemplate restTemplate = new RestTemplate();
-        restTemplate.setRequestFactory(new HttpComponentsClientHttpRequestFactory());
-        SmsRes smsResponse = restTemplate.postForObject(new URI("https://sens.apigw.ntruss.com/sms/v2/services/"+this.serviceId+"/messages"), body, SmsRes.class);
-
-        return smsResponse;
-    }
-
-    // 암호화 과정.
-    public String makeSignature(Long time) throws UnsupportedEncodingException, NoSuchAlgorithmException, InvalidKeyException {
-
-        String space = " ";
-        String newLine = "\n";
-        String method = "POST";
-        String url = "/sms/v2/services/"+ this.serviceId+"/messages";
-        String timestamp = time.toString();
-        String accessKey = this.accessKey;
-        String secretKey = this.secretKey;
-
-        String message = new StringBuilder()
-                .append(method)
-                .append(space)
-                .append(url)
-                .append(newLine)
-                .append(timestamp)
-                .append(newLine)
-                .append(accessKey)
-                .toString();
-
-        SecretKeySpec signingKey = new SecretKeySpec(secretKey.getBytes("UTF-8"), "HmacSHA256");
-        Mac mac = Mac.getInstance("HmacSHA256");
-        mac.init(signingKey);
-
-        byte[] rawHmac = mac.doFinal(message.getBytes("UTF-8"));
-        String encodeBase64String = Base64.encodeBase64String(rawHmac);
-
-        return encodeBase64String;
+            JSONObject obj = coolsms.send(params);
+            System.out.println(obj.toString());
+            return obj;
+        } catch (Exception exception) {
+            throw new BaseException(DATABASE_ERROR);
+        }
     }
 
 
