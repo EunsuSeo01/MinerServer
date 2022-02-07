@@ -3,6 +3,7 @@ package com.umc.miner.src.sms;
 import com.umc.miner.config.BaseException;
 import com.umc.miner.config.BaseResponse;
 import com.umc.miner.src.sms.model.*;
+import org.json.simple.JSONObject;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -34,15 +35,15 @@ public class SmsController {
     }
 
     /**
-     * [인증번호 전송] - 서리
+     * [인증번호 전송]: CoolSMS 사용.ver - 서리
      * 인증문자 전송 & 해당 인증번호 저장 API
      * [POST] /miner/sms
      */
     @PostMapping("")
     @Transactional
-    public BaseResponse<SmsRes> sendSms(@RequestBody Request request) {
+    public BaseResponse<String> sendSms(@RequestBody SmsReq smsReq) {
         try {
-            String recipientPhoneNum = request.getRecipientPhoneNumber();
+            String recipientPhoneNum = smsReq.getPhoneNum();
 
             // 핸드폰 번호 형식 확인. 010XXXXXXXX
             if (!isRegexPhoneNum(recipientPhoneNum)) {
@@ -58,8 +59,17 @@ public class SmsController {
             }
 
             // 문자 전송.
-            request.setContent("[Miner] 인증번호는 " + authNum + "입니다.");
-            SmsRes data = smsService.sendSms(recipientPhoneNum, request.getContent());
+            JSONObject sendRes = smsService.sendSms(recipientPhoneNum, authNum);
+
+            // error 있으면 실패 메세지 띄우기.
+            if (!sendRes.get("error_count").toString().equals("0")) {
+                System.out.println("ERROR COUNT: " + sendRes.get("error_count").toString().getClass().getSimpleName());
+                throw new Exception();
+            }
+
+            // 확인.
+            System.out.println("수신자 번호 : " + recipientPhoneNum);
+            System.out.println("인증번호 : " + authNum);
 
             try {
                 // 해당 전화번호의 유저가 이전에 수신받은 인증번호가 있는지 확인.
@@ -75,7 +85,7 @@ public class SmsController {
                 return new BaseResponse<>((exception.getStatus()));
             }
 
-            return new BaseResponse<>(data);
+            return new BaseResponse<>("메세지 전송이 완료되었습니다.");
         } catch (Exception e) {
             return new BaseResponse<>(FAILED_TO_MSG);
         }

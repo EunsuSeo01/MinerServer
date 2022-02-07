@@ -171,7 +171,7 @@ public class UserController {
 
     /**
      * [아이디(=이메일) 찾기] - 서리
-     * 가입된 phoneNum인지 확인하는 API
+     * 가입된 phoneNum인지 확인하는 API -> 문자 인증을 가입할 때랑 아이디 찾기 모두에서 쓰기 때문에 구분을 위해 분리해놓은 것.
      * [POST] /miner/users/phoneNum
      */
     @ResponseBody
