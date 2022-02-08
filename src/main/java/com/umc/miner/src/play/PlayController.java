@@ -41,7 +41,7 @@ public class PlayController {
     }
 
     /**
-     * 맵 공유하기 API
+     * 맵 공유하기 API - 루시
      * [POST] /playmaps/share
      */
     @ResponseBody
@@ -65,7 +65,7 @@ public class PlayController {
     }
 
     /**
-     * 공유된 맵 수정 API
+     * 공유된 맵 수정 API - 루시
      * [PATCH] /playmaps/modify
      */
     @ResponseBody
@@ -83,7 +83,7 @@ public class PlayController {
     }
 
     /**
-     * 맵 공유 중지 API
+     * 맵 공유 중지 API - 루시
      * [PATCH] /playmaps/stop
      */
     @Transactional(rollbackFor = {RuntimeException.class, Error.class})
@@ -111,7 +111,7 @@ public class PlayController {
 
 
     /**
-     * 공유된 맵을 페이징 처리해서 보여주는 API
+     * 공유된 맵을 페이징 처리해서 보여주는 API - 서리
      * [POST] /miner/playmaps
      */
     @ResponseBody
@@ -131,7 +131,7 @@ public class PlayController {
     }
 
     /**
-     * 검색 결과를 페이징 처리해서 보여주는 API
+     * 검색 결과를 페이징 처리해서 보여주는 API - 서리
      * [POST] /miner/playmaps/search
      */
     @ResponseBody
@@ -152,7 +152,7 @@ public class PlayController {
     }
 
     /**
-     * 맵 배열 관련 정보 가져오는 API
+     * 맵 배열 관련 정보 가져오는 API - 서리
      * [POST] /miner/playmaps/info
      */
     @ResponseBody
@@ -172,7 +172,7 @@ public class PlayController {
 
 
     /**
-     * 미로맵 클릭 시 mapPassword, mapSize, user, playTime을 알려준다.
+     * 미로맵 클릭 시 mapPassword, mapSize, user, playTime을 알려준다. - 릴라
      * [POST] /miner/playmaps/loadPlayInfo
      */
     @ResponseBody
@@ -225,7 +225,7 @@ public class PlayController {
 
 
     /**
-     * 정보 비교후 플레이 정보 저장, playCount++
+     * 정보 비교후 플레이 정보 저장, playCount++ - 릴라
      * [PATCH] /miner/playmaps/savePlayInfo
      */
     @ResponseBody
