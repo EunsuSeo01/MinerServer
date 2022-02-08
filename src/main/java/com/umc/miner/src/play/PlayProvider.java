@@ -2,6 +2,8 @@ package com.umc.miner.src.play;
 
 import com.umc.miner.config.BaseException;
 import com.umc.miner.src.play.model.*;
+import com.umc.miner.src.user.model.DeleteInfo;
+import com.umc.miner.src.user.model.PatchDeleteUserInfoReq;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -86,15 +88,6 @@ public class PlayProvider {
         }
     }
 
-    // save할 때 playCount 업데이트
-    public void playCount(PatchSavePlayReq patchSavePlayReq) throws BaseException {
-        try {
-            playDao.playCount(patchSavePlayReq);
-        } catch (Exception exception) {
-            throw new BaseException(FAILED_PLAYCOUNT);
-        }
-    }
-
     // PlayTime 가져올 때
     public PlayMapInfo checkPlayTime(PostLoadPlayReq postLoadPlayReq) throws BaseException {
         try {
@@ -162,6 +155,15 @@ public class PlayProvider {
     public List<GetMapInfoRes> getMapInfo(GetMapInfoReq getMapInfoReq) throws BaseException {
         try {
             return playDao.getMapInfo(getMapInfoReq);
+        } catch (Exception exception) {
+            throw new BaseException(DATABASE_ERROR);
+        }
+    }
+
+    // mapIdx 찾기
+    public List<DeleteInfo> getDMapIdx(PatchDeleteUserInfoReq patchDeleteUserInfoReq) throws BaseException {
+        try {
+            return playDao.getDMapIdx(patchDeleteUserInfoReq);
         } catch (Exception exception) {
             throw new BaseException(DATABASE_ERROR);
         }

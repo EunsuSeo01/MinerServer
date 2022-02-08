@@ -2,6 +2,8 @@ package com.umc.miner.src.user;
 
 import com.umc.miner.config.BaseException;
 import com.umc.miner.config.BaseResponse;
+import com.umc.miner.src.play.PlayProvider;
+import com.umc.miner.src.play.PlayService;
 import com.umc.miner.src.user.model.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -10,7 +12,10 @@ import com.umc.miner.src.sms.SmsService;
 import com.umc.miner.src.sms.SmsProvider;
 import com.umc.miner.src.sms.model.*;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.transaction.interceptor.TransactionAspectSupport;
 import org.springframework.web.bind.annotation.*;
+
+import java.util.List;
 
 import static com.umc.miner.config.BaseResponseStatus.*;
 import static com.umc.miner.utils.ValidationRegex.isRegexEmail;
@@ -33,12 +38,17 @@ public class UserController {
     @Autowired
     private final SmsService smsService;
 
+    private final PlayProvider playProvider;
+    private final PlayService playService;
 
-    public UserController(UserProvider userProvider, UserService userService, SmsProvider smsProvider, SmsService smsService) {
+    @Autowired
+    public UserController(UserProvider userProvider, UserService userService, SmsProvider smsProvider, SmsService smsService, PlayProvider playProvider, PlayService playService) {
         this.userProvider = userProvider;
         this.userService = userService;
         this.smsProvider = smsProvider;
         this.smsService = smsService;
+        this.playProvider = playProvider;
+        this.playService = playService;
     }
 
     /**
@@ -276,6 +286,36 @@ public class UserController {
             String result = "비밀번호가 변경되었습니다.";
             return new BaseResponse<>(result);
         } catch (BaseException exception) {
+            return new BaseResponse<>(exception.getStatus());
+        }
+    }
+
+    /**
+     * 회원 탈퇴 API - 릴라
+     * [PATCH] /users/deleteUserInfo
+     */
+    @Transactional(rollbackFor = {RuntimeException.class, Error.class})
+    @ResponseBody
+    @PatchMapping("/deleteUserInfo")
+    public BaseResponse<String> deleteUserInfo(@RequestBody PatchDeleteUserInfoReq patchDeleteUserInfoReq) {
+        try {
+            if (userProvider.getUser(patchDeleteUserInfoReq.getEmail()) == 0) {
+                return new BaseResponse<>(FAILED_TO_DELETE_EMAIL);
+            }
+            // userIdx set
+            patchDeleteUserInfoReq.setUserIdx(userProvider.dGetUserIdx(patchDeleteUserInfoReq));
+            // mapIdx set
+            List<DeleteInfo> dMapIdx = playProvider.getDMapIdx(patchDeleteUserInfoReq);
+            for (int i = 0; i < dMapIdx.size(); i++) {
+                playService.deletePlayInfo(dMapIdx.get(i).getMapIdx());
+                playService.deletePlayTimeInfo(dMapIdx.get(i).getMapIdx());
+            }
+            userService.deleteUserInfo(patchDeleteUserInfoReq);
+
+            String result = "회원정보가 삭제되었습니다.";
+            return new BaseResponse<>(result);
+        } catch (BaseException exception) {
+            TransactionAspectSupport.currentTransactionStatus().setRollbackOnly();
             return new BaseResponse<>(exception.getStatus());
         }
     }

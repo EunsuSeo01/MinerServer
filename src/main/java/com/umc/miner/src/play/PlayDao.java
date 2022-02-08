@@ -3,6 +3,8 @@ package com.umc.miner.src.play;
 import com.umc.miner.src.play.model.*;
 
 import com.umc.miner.src.user.*;
+import com.umc.miner.src.user.model.DeleteInfo;
+import com.umc.miner.src.user.model.PatchDeleteUserInfoReq;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.stereotype.Repository;
@@ -300,4 +302,31 @@ public class PlayDao {
                         rs.getInt("mapSize")
                 ), getMapInfoReq.getEditorName(), getMapInfoReq.getMapName());
     }
+
+    // 맵 배열 정보 & 사이즈 정보를 가져온다.
+    public List<DeleteInfo> getDMapIdx(PatchDeleteUserInfoReq patchDeleteUserInfoReq) {
+        return this.jdbcTemplate.query("select mapIdx from PlayMap where editorIdx = ?",
+                (rs, rowNum) -> new DeleteInfo(
+                        rs.getInt("mapIdx")
+                ), patchDeleteUserInfoReq.getUserIdx());
+    }
+
+    public int deletePlayInfo(int mapIdx) {
+        String deletePlayQuery = "delete from PlayMap where mapIdx = ? ";
+        Object[] deletePlayParams = new Object[]{mapIdx};
+        return this.jdbcTemplate.update(deletePlayQuery, deletePlayParams);
+    }
+
+    public int deletePlayTimeInfo(int mapIdx) {
+        String deletePlayQuery = "delete from PlayTime where mapIdx = ? ";
+        Object[] deletePlayParams = new Object[]{mapIdx};
+        return this.jdbcTemplate.update(deletePlayQuery, deletePlayParams);
+    }
+
+    // userIdx, mapIdx가져오기
+//    public int getDMapIdx(PatchDeleteUserInfoReq patchDeleteUserInfoReq) {
+//        String getMapIdxQuery = "select mapIdx from PlayMap where editorIdx = ?";
+//
+//        return this.jdbcTemplate.queryForObject(getMapIdxQuery, int.class, patchDeleteUserInfoReq.getUserIdx());
+//    }
 }

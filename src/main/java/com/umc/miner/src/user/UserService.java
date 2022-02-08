@@ -80,4 +80,12 @@ public class UserService {
         }
 
     }
+
+    public void deleteUserInfo(PatchDeleteUserInfoReq patchDeleteUserInfoReq) throws BaseException {
+        try {
+            userDao.deleteUserInfo(patchDeleteUserInfoReq);
+        } catch (Exception ignored) {
+            throw new BaseException(FAILED_DELETE_ACCOUNT);
+        }
+    }
 }

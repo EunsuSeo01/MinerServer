@@ -243,13 +243,11 @@ public class PlayController {
             if (playProvider.checkPlayerInfo(patchSavePlayReq) == 0) {
                 patchSavePlayRes.setPlayerName(playProvider.savePlayInfo(patchSavePlayReq));
                 // play count ++
-                playProvider.playCount(patchSavePlayReq);
-
+                playService.playCount(patchSavePlayReq);
             } else {
                 patchSavePlayRes.setPlayerName(playService.updatePlayerInfo(patchSavePlayReq));
                 // play count ++
-                playProvider.playCount(patchSavePlayReq);
-
+                playService.playCount(patchSavePlayReq);
             }
             return new BaseResponse<>(patchSavePlayRes);
         } catch (BaseException exception) {
