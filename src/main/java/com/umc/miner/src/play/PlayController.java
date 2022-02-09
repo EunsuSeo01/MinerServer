@@ -242,14 +242,15 @@ public class PlayController {
 
             if (playProvider.checkPlayerInfo(patchSavePlayReq) == 0) {
                 patchSavePlayRes.setPlayerName(playProvider.savePlayInfo(patchSavePlayReq));
+                patchSavePlayRes.setRank(playProvider.getRank(patchSavePlayReq));
+                System.out.println(patchSavePlayRes.getRank()+" 오잉?");
                 // play count ++
-                playProvider.playCount(patchSavePlayReq);
-
+                playService.playCount(patchSavePlayReq);
             } else {
                 patchSavePlayRes.setPlayerName(playService.updatePlayerInfo(patchSavePlayReq));
+                patchSavePlayRes.setRank(playProvider.getRank(patchSavePlayReq));
                 // play count ++
-                playProvider.playCount(patchSavePlayReq);
-
+                playService.playCount(patchSavePlayReq);
             }
             return new BaseResponse<>(patchSavePlayRes);
         } catch (BaseException exception) {

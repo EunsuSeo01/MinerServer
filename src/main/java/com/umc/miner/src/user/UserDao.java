@@ -103,4 +103,18 @@ public class UserDao {
         String getNickIdxQuery = "select userIdx from User where nickName = ?";
         return this.jdbcTemplate.queryForObject(getNickIdxQuery, int.class, nickName);
     }
+
+    // 이메일, 비변 -> user idx 가져오기
+    public int dGetUserIdx(PatchDeleteUserInfoReq patchDeleteUserInfoReq) {
+        String getUserIdxQuery = "select userIdx from User where email = ? AND password = ?";
+        return this.jdbcTemplate.queryForObject(getUserIdxQuery, int.class, patchDeleteUserInfoReq.getEmail(), patchDeleteUserInfoReq.getPassword());
+    }
+
+    // 회원 탈퇴
+    public int deleteUserInfo(PatchDeleteUserInfoReq patchDeleteUserInfoReq) {
+        String deleteUserInfoQuery = "delete from User where userIdx = ? ";
+        Object[] deleteUserInfoParams = new Object[]{patchDeleteUserInfoReq.getUserIdx()};
+
+        return this.jdbcTemplate.update(deleteUserInfoQuery, deleteUserInfoParams);
+    }
 }

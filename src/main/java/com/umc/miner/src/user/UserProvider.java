@@ -156,4 +156,16 @@ public class UserProvider {
             throw new BaseException(DATABASE_ERROR);
         }
     }
+
+    // 이메일, 비번으로 유저idx가져오기
+    public int dGetUserIdx(PatchDeleteUserInfoReq patchDeleteUserInfoReq) throws BaseException {
+        try {
+            String encodingPw = new AES128(Secret.USER_INFO_PASSWORD_KEY).encrypt(patchDeleteUserInfoReq.getPassword());
+            patchDeleteUserInfoReq.setPassword(encodingPw);
+
+            return userDao.dGetUserIdx(patchDeleteUserInfoReq);
+        } catch (Exception exception) {
+            throw new BaseException(PASSWORD_ENCRYPTION_ERROR);
+        }
+    }
 }

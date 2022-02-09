@@ -3,6 +3,8 @@ package com.umc.miner.src.play;
 import com.umc.miner.src.play.model.*;
 
 import com.umc.miner.src.user.*;
+import com.umc.miner.src.user.model.DeleteInfo;
+import com.umc.miner.src.user.model.PatchDeleteUserInfoReq;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.stereotype.Repository;
@@ -111,7 +113,6 @@ public class PlayDao {
     public int getMapIdx(DelMapReq delMapReq) {
         String getMapIdxQuery = "select mapIdx from PlayMap where (editorIdx = ?) and (mapName = ?)";
         Object[] getMapIdxParams = new Object[]{delMapReq.getEditorIdx(), delMapReq.getMapName()};
-
         return this.jdbcTemplate.queryForObject(getMapIdxQuery, int.class, getMapIdxParams);
     }
 
@@ -154,7 +155,6 @@ public class PlayDao {
         String countMapQuery = "select count(case when editorIdx = ? and status='active' then 1 end) from PlayMap";
         int countMapParams = postMapReq.getEditorIdx();
         return this.jdbcTemplate.queryForObject(countMapQuery, int.class, countMapParams);
-
     }
 
     // 공유된 맵이 총 몇 개인지 알려준다.
@@ -299,5 +299,37 @@ public class PlayDao {
                         rs.getString("mapInfo"),
                         rs.getInt("mapSize")
                 ), getMapInfoReq.getEditorName(), getMapInfoReq.getMapName());
+    }
+
+    // 맵 배열 정보 & 사이즈 정보를 가져온다.
+    public List<DeleteInfo> getDMapIdx(PatchDeleteUserInfoReq patchDeleteUserInfoReq) {
+        return this.jdbcTemplate.query("select mapIdx from PlayMap where editorIdx = ?",
+                (rs, rowNum) -> new DeleteInfo(
+                        rs.getInt("mapIdx")
+                ), patchDeleteUserInfoReq.getUserIdx());
+    }
+
+    public int deletePlayInfo(int mapIdx) {
+        String deletePlayQuery = "delete from PlayMap where mapIdx = ? ";
+        Object[] deletePlayParams = new Object[]{mapIdx};
+        return this.jdbcTemplate.update(deletePlayQuery, deletePlayParams);
+    }
+
+    public int deletePlayTimeInfo(int mapIdx) {
+        String deletePlayQuery = "delete from PlayTime where mapIdx = ? ";
+        Object[] deletePlayParams = new Object[]{mapIdx};
+        return this.jdbcTemplate.update(deletePlayQuery, deletePlayParams);
+    }
+
+    public int deletePlayUser(int playerIndx) {
+        String deletePlayQuery = "delete from PlayTime where userIdx = ? ";
+        Object[] deletePlayParams = new Object[]{playerIndx};
+        return this.jdbcTemplate.update(deletePlayQuery, deletePlayParams);
+    }
+
+    public int getRank(PatchSavePlayReq patchSavePlayReq) {
+        String getRankQuery = "select ranking from (SELECT RANK() OVER(ORDER BY playTime) as ranking, playerName, playTime, mapIdx FROM PlayTime) ranked where ranked.playerName = ? AND mapIdx = ?";
+        Object[] getRankParams = new Object[]{patchSavePlayReq.getPlayerName(), patchSavePlayReq.getMapIdx()};
+        return this.jdbcTemplate.queryForObject(getRankQuery, int.class, getRankParams);
     }
 }

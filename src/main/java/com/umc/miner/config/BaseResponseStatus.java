@@ -81,6 +81,14 @@ public enum BaseResponseStatus {
 
     FAILED_ACCOUNT(false, 3019, "옳은 정보가 아닙니다."),
 
+    FAILED_DELETE_ACCOUNT(false, 3020, "회원 삭제에 실패하였습니다."),
+    FAILED_TO_DELETE_EMAIL(false,3021,"이메일이 틀렸습니다."),
+
+    FAILED_DELETE_PLAYMAP(false, 3022, "PlayMap 삭제에 실패하였습니다."),
+    FAILED_DELETE_PLAYTIME(false, 3023, "PlayTime 삭제에 실패하였습니다."),
+
+    FAILED_LOAD_RANK(false, 3024, "등수를 불러오지 못하였습니다."),
+
 
 
     /**

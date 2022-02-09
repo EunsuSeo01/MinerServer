@@ -3,6 +3,7 @@ package com.umc.miner.src.play;
 import com.fasterxml.jackson.databind.ser.Serializers;
 import com.umc.miner.config.BaseException;
 import com.umc.miner.src.play.model.*;
+import com.umc.miner.src.user.model.PatchDeleteUserInfoReq;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -82,4 +83,36 @@ public class PlayService {
         }
     }
 
+    // save할 때 playCount 업데이트
+    public void playCount(PatchSavePlayReq patchSavePlayReq) throws BaseException {
+        try {
+            playDao.playCount(patchSavePlayReq);
+        } catch (Exception exception) {
+            throw new BaseException(FAILED_PLAYCOUNT);
+        }
+    }
+
+    public void deletePlayInfo(int mapIdx) throws BaseException {
+        try {
+            playDao.deletePlayInfo(mapIdx);
+        } catch (Exception ignored) {
+            throw new BaseException(FAILED_DELETE_PLAYMAP);
+        }
+    }
+
+    public void deletePlayTimeInfo(int mapIdx) throws BaseException {
+        try {
+            playDao.deletePlayTimeInfo(mapIdx);
+        } catch (Exception ignored) {
+            throw new BaseException(FAILED_DELETE_PLAYTIME);
+        }
+    }
+
+    public void deletePlayUser(int playIdx) throws BaseException {
+        try {
+            playDao.deletePlayUser(playIdx);
+        } catch (Exception ignored) {
+            throw new BaseException(FAILED_DELETE_PLAYTIME);
+        }
+    }
 }
