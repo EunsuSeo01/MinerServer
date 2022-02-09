@@ -108,4 +108,11 @@ public class PlayService {
         }
     }
 
+    public void deletePlayUser(int playIdx) throws BaseException {
+        try {
+            playDao.deletePlayUser(playIdx);
+        } catch (Exception ignored) {
+            throw new BaseException(FAILED_DELETE_PLAYTIME);
+        }
+    }
 }

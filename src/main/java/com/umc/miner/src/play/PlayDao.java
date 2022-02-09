@@ -113,7 +113,6 @@ public class PlayDao {
     public int getMapIdx(DelMapReq delMapReq) {
         String getMapIdxQuery = "select mapIdx from PlayMap where (editorIdx = ?) and (mapName = ?)";
         Object[] getMapIdxParams = new Object[]{delMapReq.getEditorIdx(), delMapReq.getMapName()};
-
         return this.jdbcTemplate.queryForObject(getMapIdxQuery, int.class, getMapIdxParams);
     }
 
@@ -156,7 +155,6 @@ public class PlayDao {
         String countMapQuery = "select count(case when editorIdx = ? and status='active' then 1 end) from PlayMap";
         int countMapParams = postMapReq.getEditorIdx();
         return this.jdbcTemplate.queryForObject(countMapQuery, int.class, countMapParams);
-
     }
 
     // 공유된 맵이 총 몇 개인지 알려준다.
@@ -323,10 +321,15 @@ public class PlayDao {
         return this.jdbcTemplate.update(deletePlayQuery, deletePlayParams);
     }
 
-    // userIdx, mapIdx가져오기
-//    public int getDMapIdx(PatchDeleteUserInfoReq patchDeleteUserInfoReq) {
-//        String getMapIdxQuery = "select mapIdx from PlayMap where editorIdx = ?";
-//
-//        return this.jdbcTemplate.queryForObject(getMapIdxQuery, int.class, patchDeleteUserInfoReq.getUserIdx());
-//    }
+    public int deletePlayUser(int playerIndx) {
+        String deletePlayQuery = "delete from PlayTime where userIdx = ? ";
+        Object[] deletePlayParams = new Object[]{playerIndx};
+        return this.jdbcTemplate.update(deletePlayQuery, deletePlayParams);
+    }
+
+    public int getRank(PatchSavePlayReq patchSavePlayReq) {
+        String getRankQuery = "select ranking from (SELECT RANK() OVER(ORDER BY playTime) as ranking, playerName, playTime, mapIdx FROM PlayTime) ranked where ranked.playerName = ? AND mapIdx = ?";
+        Object[] getRankParams = new Object[]{patchSavePlayReq.getPlayerName(), patchSavePlayReq.getMapIdx()};
+        return this.jdbcTemplate.queryForObject(getRankQuery, int.class, getRankParams);
+    }
 }

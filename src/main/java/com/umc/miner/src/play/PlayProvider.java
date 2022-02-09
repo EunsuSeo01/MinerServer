@@ -168,4 +168,12 @@ public class PlayProvider {
             throw new BaseException(DATABASE_ERROR);
         }
     }
+
+    public int getRank(PatchSavePlayReq patchSavePlayReq) throws BaseException {
+        try {
+            return playDao.getRank(patchSavePlayReq);
+        } catch (Exception exception) {
+            throw new BaseException(FAILED_LOAD_RANK);
+        }
+    }
 }

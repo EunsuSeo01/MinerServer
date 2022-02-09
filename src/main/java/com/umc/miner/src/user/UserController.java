@@ -311,6 +311,7 @@ public class UserController {
                 playService.deletePlayTimeInfo(dMapIdx.get(i).getMapIdx());
             }
             userService.deleteUserInfo(patchDeleteUserInfoReq);
+            playService.deletePlayUser(patchDeleteUserInfoReq.getUserIdx());
 
             String result = "회원정보가 삭제되었습니다.";
             return new BaseResponse<>(result);

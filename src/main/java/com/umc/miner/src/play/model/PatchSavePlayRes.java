@@ -9,4 +9,5 @@ import lombok.Setter;
 @NoArgsConstructor
 public class PatchSavePlayRes {
     private String playerName;
+    private int rank;
 }
