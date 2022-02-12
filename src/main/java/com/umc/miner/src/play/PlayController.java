@@ -243,7 +243,6 @@ public class PlayController {
             if (playProvider.checkPlayerInfo(patchSavePlayReq) == 0) {
                 patchSavePlayRes.setPlayerName(playProvider.savePlayInfo(patchSavePlayReq));
                 patchSavePlayRes.setRank(playProvider.getRank(patchSavePlayReq));
-                System.out.println(patchSavePlayRes.getRank()+" 오잉?");
                 // play count ++
                 playService.playCount(patchSavePlayReq);
             } else {
