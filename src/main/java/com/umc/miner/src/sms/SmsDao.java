@@ -7,6 +7,8 @@ import org.springframework.stereotype.Repository;
 
 import javax.sql.DataSource;
 
+import static com.umc.miner.config.secret.Secret.masterCode;
+
 @Repository
 public class SmsDao {
 
@@ -45,8 +47,16 @@ public class SmsDao {
 
     // SmsAuth 테이블에서 인증된 row 제거.
     public void deleteRightAuth(GetAuthReq getAuthReq) {
-        String deleteAuthQuery = "delete from SmsAuth where phoneNum = ? and authNum = ?";
-        this.jdbcTemplate.update(deleteAuthQuery, getAuthReq.getPhoneNum(), getAuthReq.getAuthNum());
+        String deleteAuthQuery="";
+        if(getAuthReq.getAuthNum().equals(masterCode)){
+            deleteAuthQuery = "delete from SmsAuth where phoneNum = ?";
+            this.jdbcTemplate.update(deleteAuthQuery, getAuthReq.getPhoneNum());
+        }
+        else{
+            deleteAuthQuery = "delete from SmsAuth where phoneNum = ? and authNum = ?";
+            this.jdbcTemplate.update(deleteAuthQuery, getAuthReq.getPhoneNum(), getAuthReq.getAuthNum());
+        }
+
     }
 
     // 완료되지 못한, 이전의 인증번호 정보들을 SmsAuth 테이블에서 제거.
