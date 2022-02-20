@@ -18,6 +18,7 @@ import org.springframework.web.bind.annotation.*;
 import java.util.List;
 
 import static com.umc.miner.config.BaseResponseStatus.*;
+import static com.umc.miner.config.secret.Secret.masterCode;
 import static com.umc.miner.utils.ValidationRegex.isRegexEmail;
 import static com.umc.miner.utils.ValidationRegex.isRegexPassword;
 import static com.umc.miner.utils.ValidationRegex.isRegexNickName;
@@ -165,14 +166,25 @@ public class UserController {
     @PostMapping("/signup/auth")
     public BaseResponse<String> checkAuthNum(@RequestBody GetAuthReq getAuthReq) {
         try {
-            // 인증번호가 일치하지 않은 경우.
-            if (smsProvider.checkRightAuthNum(getAuthReq) == 0) {
-                return new BaseResponse<>(NOT_MATCHED_AUTH);
+            //마스터 번호인 경우.
+            System.out.println(masterCode);
+            if(getAuthReq.getAuthNum().equals(masterCode)){
+
+                smsService.deleteRightAuth(getAuthReq);
+                return new BaseResponse<>("인증이 완료되었습니다.");
+            }
+            else{
+                System.out.println(getAuthReq.getAuthNum());
+                // 인증번호가 일치하지 않은 경우.
+                if (smsProvider.checkRightAuthNum(getAuthReq) == 0) {
+                    return new BaseResponse<>(NOT_MATCHED_AUTH);
+                }
+
+                // 일치함 -> SmsAuth 테이블에서 row 제거.
+                smsService.deleteRightAuth(getAuthReq);
+                return new BaseResponse<>("인증이 완료되었습니다.");
             }
 
-            // 일치함 -> SmsAuth 테이블에서 row 제거.
-            smsService.deleteRightAuth(getAuthReq);
-            return new BaseResponse<>("인증이 완료되었습니다.");
         } catch (BaseException exception) {
             return new BaseResponse<>((exception.getStatus()));
         }
