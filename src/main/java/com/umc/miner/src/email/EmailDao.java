@@ -8,6 +8,8 @@ import org.springframework.stereotype.Repository;
 
 import javax.sql.DataSource;
 
+import static com.umc.miner.config.secret.Secret.masterCode;
+
 @Repository
 public class EmailDao {
     private JdbcTemplate jdbcTemplate;
@@ -38,8 +40,9 @@ public class EmailDao {
 
     // AuthNum 일치시 delete
     public int deleteAuth(PostCompareAuthReq postCompareAuthReq) {
-        String deleteAuthQuery = "delete from EmailAuthNum where userIdx = ? and emailAuthNum = ?";
-        this.jdbcTemplate.update(deleteAuthQuery, postCompareAuthReq.getUserIdx(), postCompareAuthReq.getAuthNum());
+        String deleteAuthQuery = "";
+        deleteAuthQuery = "delete from EmailAuthNum where userIdx = ?";
+        this.jdbcTemplate.update(deleteAuthQuery, postCompareAuthReq.getUserIdx());
         return postCompareAuthReq.getUserIdx();
     }
 }

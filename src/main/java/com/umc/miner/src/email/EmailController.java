@@ -11,6 +11,7 @@ import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;
 
 import static com.umc.miner.config.BaseResponseStatus.*;
+import static com.umc.miner.config.secret.Secret.masterCode;
 import static com.umc.miner.utils.ValidationRegex.isRegexEmail;
 
 @Controller
@@ -71,17 +72,25 @@ public class EmailController {
     @PostMapping("/compareAuth")
     public BaseResponse<PostCompareAuthRes> compareAuth(@RequestBody PostCompareAuthReq postCompareAuthReq) {
         try {
-            // 인증번호 빈칸
-            if (postCompareAuthReq.getAuthNum() == null || postCompareAuthReq.getUserIdx() == 0) {
-                return new BaseResponse<>(POST_EMAIL_EMPTY_EMAIL);
+            //인증번호 마스터코드
+            if(postCompareAuthReq.getAuthNum().equals(masterCode)){
+                PostCompareAuthRes postCompareAuthRes = new PostCompareAuthRes(emailProvider.deleteAuth(postCompareAuthReq));
+                return new BaseResponse<>(postCompareAuthRes);
             }
-            // 인증번호 비교 틀렸을 때
-            if (emailProvider.compareAuth(postCompareAuthReq) == 0) {
-                return new BaseResponse<>(POST_EMAIL_FAIL_EMAIL);
+            else{
+                // 인증번호 빈칸
+                if (postCompareAuthReq.getAuthNum() == null || postCompareAuthReq.getUserIdx() == 0) {
+                    return new BaseResponse<>(POST_EMAIL_EMPTY_EMAIL);
+                }
+                // 인증번호 비교 틀렸을 때
+                if (emailProvider.compareAuth(postCompareAuthReq) == 0) {
+                    return new BaseResponse<>(POST_EMAIL_FAIL_EMAIL);
+                }
+
+                PostCompareAuthRes postCompareAuthRes = new PostCompareAuthRes(emailProvider.deleteAuth(postCompareAuthReq));
+                return new BaseResponse<>(postCompareAuthRes);
             }
 
-            PostCompareAuthRes postCompareAuthRes = new PostCompareAuthRes(emailProvider.deleteAuth(postCompareAuthReq));
-            return new BaseResponse<>(postCompareAuthRes);
         } catch (BaseException exception) {
             return new BaseResponse<>((exception.getStatus()));
         }
