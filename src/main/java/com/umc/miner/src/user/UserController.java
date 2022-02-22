@@ -167,14 +167,13 @@ public class UserController {
     public BaseResponse<String> checkAuthNum(@RequestBody GetAuthReq getAuthReq) {
         try {
             //마스터 번호인 경우.
-            System.out.println(masterCode);
+            //System.out.println(masterCode);
             if(getAuthReq.getAuthNum().equals(masterCode)){
-
                 smsService.deleteRightAuth(getAuthReq);
                 return new BaseResponse<>("인증이 완료되었습니다.");
             }
             else{
-                System.out.println(getAuthReq.getAuthNum());
+                //System.out.println(getAuthReq.getAuthNum());
                 // 인증번호가 일치하지 않은 경우.
                 if (smsProvider.checkRightAuthNum(getAuthReq) == 0) {
                     return new BaseResponse<>(NOT_MATCHED_AUTH);
@@ -226,18 +225,30 @@ public class UserController {
     @PostMapping("/find-email")
     public BaseResponse<GetEmailRes> getUserEmail(@RequestBody GetAuthReq getAuthReq) {
         try {
-            // 인증번호가 일치하지 않은 경우.
-            if (smsProvider.checkRightAuthNum(getAuthReq) == 0) {
-                return new BaseResponse<>(NOT_MATCHED_AUTH);
+            //마스터 코드인경우
+            if(getAuthReq.getAuthNum().equals(masterCode)){
+                smsService.deleteRightAuth(getAuthReq);
+                String permittedPhoneNum = getAuthReq.getPhoneNum();
+
+                // 이메일 가져옴.
+                GetEmailRes getEmailRes = new GetEmailRes(userProvider.getUserEmail(permittedPhoneNum));
+                return new BaseResponse<>(getEmailRes);
+            }
+            else{
+                // 인증번호가 일치하지 않은 경우.
+                if (smsProvider.checkRightAuthNum(getAuthReq) == 0) {
+                    return new BaseResponse<>(NOT_MATCHED_AUTH);
+                }
+
+                // 일치함 -> SmsAuth 테이블에서 row 제거 & 일치하게 입력한 유저 인덱스 리턴.
+                smsService.deleteRightAuth(getAuthReq);
+                String permittedPhoneNum = getAuthReq.getPhoneNum();
+
+                // 이메일 가져옴.
+                GetEmailRes getEmailRes = new GetEmailRes(userProvider.getUserEmail(permittedPhoneNum));
+                return new BaseResponse<>(getEmailRes);
             }
 
-            // 일치함 -> SmsAuth 테이블에서 row 제거 & 일치하게 입력한 유저 인덱스 리턴.
-            smsService.deleteRightAuth(getAuthReq);
-            String permittedPhoneNum = getAuthReq.getPhoneNum();
-
-            // 이메일 가져옴.
-            GetEmailRes getEmailRes = new GetEmailRes(userProvider.getUserEmail(permittedPhoneNum));
-            return new BaseResponse<>(getEmailRes);
         } catch (BaseException exception) {
             return new BaseResponse<>((exception.getStatus()));
         }
