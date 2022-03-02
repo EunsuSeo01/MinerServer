@@ -328,8 +328,8 @@ public class PlayDao {
     }
 
     public int getRank(PatchSavePlayReq patchSavePlayReq) {
-        String getRankQuery = "select ranking from (SELECT RANK() OVER(ORDER BY playTime) as ranking, playerName, playTime, mapIdx FROM PlayTime) ranked where ranked.playerName = ? AND mapIdx = ?";
-        Object[] getRankParams = new Object[]{patchSavePlayReq.getPlayerName(), patchSavePlayReq.getMapIdx()};
+        String getRankQuery = "select ranking from (SELECT RANK() OVER(ORDER BY playTime) as ranking, playerName, playTime, mapIdx FROM PlayTime where mapIdx = ?) ranked where (ranked.playerName = ?)";
+        Object[] getRankParams = new Object[]{patchSavePlayReq.getMapIdx(), patchSavePlayReq.getPlayerName()};
         return this.jdbcTemplate.queryForObject(getRankQuery, int.class, getRankParams);
     }
 }
